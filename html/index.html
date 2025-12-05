@@ -17,10 +17,7 @@
             <h1 class="name">Lucian Cibu</h1>
             <p class="role">Software Engineer</p>
             <p class="location">Cluj-Napoca, Romania</p>
-        </div>
-        <div class="views">
-            <p id="view-counter">Loading views...</p>
-        </div>        
+        </div>       
         <div class="contact">
             <div class="contact-item">
                 <span class="contact-label">Phone</span>
@@ -191,11 +188,13 @@
                 </p>
             </article>
         </section>
-
     </main>
-
-</div>
+        <div class="views">
+            <p id="view-counter">Loading views...</p>
+        </div> 
 </body>
+</div>
+
 <script>
 async function updateCounter() {
     if (!sessionStorage.getItem("counted")) {
