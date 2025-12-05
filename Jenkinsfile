@@ -17,13 +17,10 @@ pipeline {
         }
         
         stage('Deploy to S3') {
-            steps {
-                s3Upload(
-                    bucket: "${S3_BUCKET}",
-                    includePathPattern: "**/*.html,**/*.css",
-                    workingDir: "html",
-                    acl: "PublicRead"
-                )
+           steps {
+                sh '''
+                    aws s3 sync html/ s3://'"${S3_BUCKET}"'/ --delete
+                '''
             }
         }
 
