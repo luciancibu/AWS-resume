@@ -13,23 +13,22 @@ pipeline {
             steps {
                 sh """
                     cd lambda
-                    zip -r ../lambda.zip .
-                    
+                    zip -r ../lambda.zip .    
                 """
             }
         }
 
-        // stage('Deploy Lambda Function') {
-        //     steps {
-        //         withAWS(credentials: 'awscreds', region: AWS_REGION) {
-        //             sh """
-        //                 aws lambda update-function-code \
-        //                     --function-name ${LAMBDA_FUNCTION} \
-        //                     --zip-file fileb://lambda.zip
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Deploy Lambda Function') {
+            steps {
+                withAWS(credentials: 'awscreds', region: AWS_REGION) {
+                    sh """
+                        aws lambda update-function-code \
+                            --function-name ${LAMBDA_FUNCTION} \
+                            --zip-file fileb://lambda.zip
+                    """
+                }
+            }
+        }
 
         stage('Upload to S3') {
             steps {
