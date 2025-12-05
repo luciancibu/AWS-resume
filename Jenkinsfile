@@ -20,6 +20,18 @@ pipeline {
                     """
                 }
             }
-        }        
+        }
+
+        stage('Invalidate CloudFront Cache') {
+            steps {
+                withAWS(credentials: 'awscreds', region: "${AWS_REGION}") {
+                    sh """
+                        aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
+
+                        echo "CloudFront cache invalidation initiated."
+                    """
+                }
+            }
+        }
   }
 }
