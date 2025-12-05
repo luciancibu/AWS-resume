@@ -17,7 +17,9 @@
             <p class="role">Software Engineer</p>
             <p class="location">Cluj-Napoca, Romania</p>
         </div>
-
+        <div class="views">
+            <p id="view-counter">Loading views...</p>
+        </div>        
         <div class="contact">
             <div class="contact-item">
                 <span class="contact-label">Phone</span>
@@ -35,7 +37,7 @@
                 <span class="contact-label">Website</span>
                 <a href="https://resume.lucian-cibu.xyz" target="_blank">resume.lucian-cibu.xyz</a>
             </div>
-        </div>
+        </div>        
     </header>
 
 
@@ -193,4 +195,15 @@
 
 </div>
 </body>
+<script>
+async function updateCounter() {
+    let response = await fetch("https://2sxgit3exhpmlq6ihg3gsg24d40bqegu.lambda-url.us-east-1.on.aws/");
+    let data = await response.text();
+
+    document.getElementById("view-counter").innerHTML = `Views: ${data}`;
+}
+
+updateCounter();
+</script>
+
 </html>

@@ -7,7 +7,6 @@ def lambda_handler(event, context):
     response = table.get_item(Key={'id': '0'})
     views = response['Item']['views'] + 1
     table.put_item(Item={'id': '0', 'views': views})
-    print("Test")
 
     return {
         "statusCode": 200,
