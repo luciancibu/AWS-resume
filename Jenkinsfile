@@ -9,20 +9,12 @@ pipeline {
 
   stages {
    
-        stage('Fetch code') {
+        stage('Checkout HTML repo') {
             steps {
-               git branch: 'master', url: 'https://github.com/luciancibu/AWS-resume.git'
-               sh 'echo "Code fetched successfully!"'
+                sshagent(['github-ssh-key']) {
+                    sh 'git clone git@github.com:luciancibu/AWS-resume.git'
+                }
             }
         }
-            
-        // stage('Deploy to S3') {
-        //    steps {
-        //         sh '''
-        //             aws s3 sync html/ s3://'"${S3_BUCKET}"'/ --delete
-        //         '''
-        //     }
-        // }
-
   }
 }
