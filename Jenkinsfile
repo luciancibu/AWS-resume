@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                sh 'echo "Test git push trigger"'
+                sh 'echo "Test git push trigger 2"'
             }
         }
     }
