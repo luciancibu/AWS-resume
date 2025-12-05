@@ -11,10 +11,8 @@ pipeline {
    
         stage('Checkout HTML repo') {
             steps {
-                // sshagent(['github-ssh-key']) {
-                    // sh 'git clone git@github.com:luciancibu/AWS-resume.git'
-                // }
-                echo 'Test'
+                echo 'Test' 
+
             }
         }
   }
