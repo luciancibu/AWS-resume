@@ -9,14 +9,14 @@ pipeline {
     }    
 
   stages {
-        // stage('Zip Lambda Function') {
-        //     steps {
-        //         sh """
-        //             cd lambda
-        //             zip -r ../lambda.zip .
-        //         """
-        //     }
-        // }
+        stage('Zip Lambda Function') {
+            steps {
+                sh """
+                    cd lambda
+                    zip -r ../lambda.zip .
+                """
+            }
+        }
 
         // stage('Deploy Lambda Function') {
         //     steps {
