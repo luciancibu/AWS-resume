@@ -14,6 +14,7 @@ pipeline {
                 sh """
                     cd lambda
                     zip -r ../lambda.zip .
+                    
                 """
             }
         }
