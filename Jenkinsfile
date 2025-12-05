@@ -9,10 +9,11 @@ pipeline {
 
   stages {
    
-        stage('Checkout HTML repo') {
+        stage('Configure AWS Credentials') {
             steps {
-                echo 'Test' 
-
+                withAWS(credentials: 'awscreds', region: "${AWS_REGION}") {
+                    sh 'aws sts get-caller-identity'
+                }
             }
         }
   }
