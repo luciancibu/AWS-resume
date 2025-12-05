@@ -11,11 +11,11 @@ pipeline {
    
         stage('Fetch code') {
             steps {
-               git branch: 'master', url: 'git@github.com:luciancibu/AWS-resume.git'
+               git branch: 'master', url: 'https://github.com/luciancibu/AWS-resume.git'
                sh 'echo "Code fetched successfully!"'
             }
         }
-
+            
         // stage('Deploy to S3') {
         //    steps {
         //         sh '''
