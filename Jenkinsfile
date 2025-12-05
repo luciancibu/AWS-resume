@@ -34,11 +34,7 @@ pipeline {
             steps {
                 withAWS(credentials: 'awscreds', region: "${AWS_REGION}") {
                     sh """
-                        aws s3 sync html/ s3://${S3_BUCKET}/ \
-                            --acl public-read \
-                            --delete
-
-                        echo "Upload complete."
+                        aws s3 sync html/ s3://${S3_BUCKET}/ --delete
                     """
                 }
             }
@@ -49,8 +45,6 @@ pipeline {
                 withAWS(credentials: 'awscreds', region: "${AWS_REGION}") {
                     sh """
                         aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
-
-                        echo "CloudFront cache invalidation initiated."
                     """
                 }
             }
