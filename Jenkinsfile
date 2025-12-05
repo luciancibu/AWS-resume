@@ -20,7 +20,7 @@ pipeline {
 
         stage('Deploy Lambda Function') {
             steps {
-                withAWS(credentials: 'awscreds', region: AWS_REGION) {
+                withAWS(credentials: 'awscreds', region: "${AWS_REGION}") {
                     sh """
                         aws lambda update-function-code \
                             --function-name ${LAMBDA_FUNCTION} \
