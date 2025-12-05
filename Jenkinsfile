@@ -16,5 +16,19 @@ pipeline {
                 }
             }
         }
+        
+        stage('Upload to S3') {
+            steps {
+                withAWS(credentials: 'awscreds', region: "${AWS_DEFAULT_REGION}") {
+                    sh """
+                        aws s3 sync html/ s3://${S3_BUCKET}/ \
+                            --acl public-read \
+                            --delete
+
+                        echo "Upload complete."
+                    """
+                }
+            }
+        }        
   }
 }
