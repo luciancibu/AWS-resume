@@ -198,13 +198,23 @@
 </body>
 <script>
 async function updateCounter() {
-    let response = await fetch("https://2sxgit3exhpmlq6ihg3gsg24d40bqegu.lambda-url.us-east-1.on.aws/");
-    let data = await response.text();
+    if (!sessionStorage.getItem("counted")) {
 
-    document.getElementById("view-counter").innerHTML = `Views: ${data}`;
+        let response = await fetch("https://2sxgit3exhpmlq6ihg3gsg24d40bqegu.lambda-url.us-east-1.on.aws/");
+        let data = await response.text();
+        document.getElementById("view-counter").innerHTML = `Views: ${data}`;
+
+        sessionStorage.setItem("counted", "true");
+
+    } else {
+        let response = await fetch("https://2sxgit3exhpmlq6ihg3gsg24d40bqegu.lambda-url.us-east-1.on.aws/?read=true");
+        let data = await response.text();
+        document.getElementById("view-counter").innerHTML = `Views: ${data}`;
+    }
 }
 
 updateCounter();
 </script>
+
 
 </html>
