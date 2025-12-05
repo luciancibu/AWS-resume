@@ -1,10 +1,15 @@
 pipeline {
     agent any
-    stages {
-        stage('Test') {
+
+  stages {
+   
+        stage('Fetch code') {
             steps {
-                sh 'echo "Test git push trigger 2"'
+               git branch: 'main', url: 'https://github.com/luciancibu/AWS-resume.git'
+               sh 'echo "Code fetched successfully!"'
             }
+
         }
-    }
+
+  }
 }
