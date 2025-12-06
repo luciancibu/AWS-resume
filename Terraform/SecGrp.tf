@@ -17,9 +17,9 @@ resource "aws_vpc_security_group_ingress_rule" "sshfromyIP" {
 resource "aws_vpc_security_group_ingress_rule" "allow_http" {
   security_group_id = aws_security_group.Jenkins_terraform-sg.id
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
+  from_port         = 8080
   ip_protocol       = "tcp"
-  to_port           = 80
+  to_port           = 8080
 }
 
 resource "aws_vpc_security_group_egress_rule" "allowAllOutbound_ipv4" {
