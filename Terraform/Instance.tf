@@ -1,3 +1,6 @@
+# Documentation References:
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
+
 resource "aws_instance" "Jenkins_terraform" {
   ami                    = var.amiID
   instance_type          = "t2.medium"

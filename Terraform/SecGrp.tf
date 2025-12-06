@@ -1,3 +1,6 @@
+# Documentation References:
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
+
 resource "aws_security_group" "Jenkins_terraform-sg" {
   name        = "Jenkins_terraform-sg"
   description = "Jenkins_terraform-sg"
