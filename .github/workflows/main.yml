@@ -1,10 +1,14 @@
 name: Deploy to S3 and Invalidate CloudFront
 
 on:
-  # push:
-    # branches: [ "main" ]
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
-
+env:
+  LAMBDA_FUNCTION: lucian-cibu-resume-lambda-terraform
+  S3_BUCKET: resume-lucian-cibu-s3-terraform
+  CLOUDFRONT_DISTRIBUTION_ID: E1NA1BA9KZIRR4
+  AWS_REGION: us-east-1
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,7 +21,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Zip Lambda function
         run: |
@@ -27,15 +31,15 @@ jobs:
       - name: Deploy Lambda
         run: |
           aws lambda update-function-code \
-            --function-name ${{ vars.LAMBDA_FUNCTION }} \
+            --function-name ${{ env.LAMBDA_FUNCTION }} \
             --zip-file fileb://Lambda.zip
 
       - name: Sync files to S3
         run: |
-          aws s3 sync html/ s3://${{ vars.S3_BUCKET }}/ --delete
+          aws s3 sync html/ s3://${{ env.S3_BUCKET }}/ --delete
 
       - name: Invalidate CloudFront
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"

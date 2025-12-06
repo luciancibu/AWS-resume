@@ -8,3 +8,4 @@ Terraform/*.hcl
 Terraform/*.info
 Terraform/*.backup
 Terraform/*.tfvars
+Lambda/*.zip
