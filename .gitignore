@@ -1,2 +1,9 @@
 _tests/
 ReadMe.md
+Terraform/.terraform/
+Terraform/terraform.tfstate
+Terraform/*.txt
+Terraform/*.exe
+Terraform/*.hcl
+Terraform/*.info
+Terraform/*.backup
