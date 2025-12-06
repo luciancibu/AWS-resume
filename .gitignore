@@ -7,3 +7,4 @@ Terraform/*.exe
 Terraform/*.hcl
 Terraform/*.info
 Terraform/*.backup
+Terraform/*.tfvars
