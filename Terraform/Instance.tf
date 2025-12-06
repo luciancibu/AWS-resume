@@ -32,7 +32,7 @@ resource "aws_instance" "Jenkins_terraform" {
       "chmod +x /tmp/setup_Jenkins.sh",
       "sudo /tmp/setup_Jenkins.sh"
     ]
-  }  
+  }
 
 }
 
