@@ -3,11 +3,10 @@ pipeline {
 
     environment {
         AWS_REGION = "us-east-1"
-        S3_BUCKET = "lucian-cibu-resume"
-        CLOUDFRONT_ID = "EDGGVY01J7KZW"
-        LAMBDA_FUNCTION = "lucian-cibu-resume-api" 
+        S3_BUCKET = "resume-lucian-cibu-s3-terraform"
+        CLOUDFRONT_ID = "E1NA1BA9KZIRR4"
+        LAMBDA_FUNCTION = "lucian-cibu-resume-lambda-terraform" 
     }    
-
   stages {
         stage('Zip Lambda Function') {
             steps {
