@@ -206,7 +206,7 @@ async function updateCounter() {
         sessionStorage.setItem("counted", "true");
 
     } else {
-        let response = await fetch("https://rgfpqf4emzxqbgu4pno7xi3prm0bedho.lambda-url.us-east-1.on.aws/");
+        let response = await fetch("https://rgfpqf4emzxqbgu4pno7xi3prm0bedho.lambda-url.us-east-1.on.aws/?read=true");
         let data = await response.text();
         document.getElementById("view-counter").innerHTML = `Views: ${data}`;
     }
