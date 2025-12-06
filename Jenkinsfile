@@ -12,8 +12,8 @@ pipeline {
         stage('Zip Lambda Function') {
             steps {
                 sh """
-                    cd lambda
-                    zip -r ../lambda.zip .    
+                    cd Lambda
+                    zip -r ../Lambda.zip .    
                 """
             }
         }
@@ -24,7 +24,7 @@ pipeline {
                     sh """
                         aws lambda update-function-code \
                             --function-name ${LAMBDA_FUNCTION} \
-                            --zip-file fileb://lambda.zip
+                            --zip-file fileb://Lambda.zip
                     """
                 }
             }

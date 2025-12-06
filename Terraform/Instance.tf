@@ -1,5 +1,6 @@
 # Documentation References:
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
+# https://developer.hashicorp.com/terraform/language/provisioners
 
 resource "aws_instance" "Jenkins_terraform" {
   ami                    = var.amiID

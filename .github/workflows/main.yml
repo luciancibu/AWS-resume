@@ -21,14 +21,14 @@ jobs:
 
       - name: Zip Lambda function
         run: |
-          cd lambda
-          zip -r ../lambda.zip .
+          cd Lambda
+          zip -r ../Lambda.zip .
 
       - name: Deploy Lambda
         run: |
           aws lambda update-function-code \
             --function-name ${{ vars.LAMBDA_FUNCTION }} \
-            --zip-file fileb://lambda.zip
+            --zip-file fileb://Lambda.zip
 
       - name: Sync files to S3
         run: |
