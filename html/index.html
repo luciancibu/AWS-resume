@@ -199,14 +199,14 @@
 async function updateCounter() {
     if (!sessionStorage.getItem("counted")) {
 
-        let response = await fetch("https://2sxgit3exhpmlq6ihg3gsg24d40bqegu.lambda-url.us-east-1.on.aws/");
+        let response = await fetch("https://rgfpqf4emzxqbgu4pno7xi3prm0bedho.lambda-url.us-east-1.on.aws/");
         let data = await response.text();
         document.getElementById("view-counter").innerHTML = `Views: ${data}`;
 
         sessionStorage.setItem("counted", "true");
 
     } else {
-        let response = await fetch("https://2sxgit3exhpmlq6ihg3gsg24d40bqegu.lambda-url.us-east-1.on.aws/?read=true");
+        let response = await fetch("https://rgfpqf4emzxqbgu4pno7xi3prm0bedho.lambda-url.us-east-1.on.aws/");
         let data = await response.text();
         document.getElementById("view-counter").innerHTML = `Views: ${data}`;
     }
