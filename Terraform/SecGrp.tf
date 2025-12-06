@@ -5,7 +5,7 @@ resource "aws_security_group" "Jenkins_terraform-sg" {
   name        = "Jenkins_terraform-sg"
   description = "Jenkins_terraform-sg"
   tags = {
-    Name = "Jenkins_terraform-sg"
+    Name    = "Jenkins_terraform-sg"
     Project = "resume-lucian-cibu"
   }
 }

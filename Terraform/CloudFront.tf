@@ -27,25 +27,25 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
     }
   }
 
-default_cache_behavior {
-  allowed_methods  = ["GET", "HEAD"]
-  cached_methods   = ["GET", "HEAD"]
-  target_origin_id = "s3-resume-origin-terraform"
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "s3-resume-origin-terraform"
 
-  forwarded_values {
-    query_string = false
+    forwarded_values {
+      query_string = false
 
-    cookies {
-      forward = "none"
+      cookies {
+        forward = "none"
+      }
     }
-  }
-     compress = true  
-    
+    compress = true
+
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 3600
-    max_ttl                = 86400  
-}
+    max_ttl                = 86400
+  }
 
 
   http_version = "http2and3"
@@ -64,7 +64,7 @@ default_cache_behavior {
   }
 
   tags = {
-    Name   = "resume-lucian-cibu-CloudFront-terraform"
+    Name    = "resume-lucian-cibu-CloudFront-terraform"
     Project = "resume-lucian-cibu"
   }
 }

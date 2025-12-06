@@ -48,12 +48,12 @@ data "aws_iam_policy_document" "iam-ss3-bucket-resume-terraform" {
   statement {
     sid    = "AllowPublicRead"
     effect = "Allow"
-resources = [
+    resources = [
       "arn:aws:s3:::resume-lucian-cibu-s3-terraform",
       "arn:aws:s3:::resume-lucian-cibu-s3-terraform/*",
     ]
-actions = ["S3:GetObject"]
-principals {
+    actions = ["S3:GetObject"]
+    principals {
       type        = "*"
       identifiers = ["*"]
     }
@@ -63,21 +63,21 @@ principals {
 }
 
 resource "aws_s3_object" "object-upload-html" {
-    for_each        = fileset("../html/", "*.html")
-    bucket          = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket
-    key             = each.value
-    source          = "../html/${each.value}"
-    content_type    = "text/html"
-    etag            = filemd5("../html/${each.value}")
+  for_each     = fileset("../html/", "*.html")
+  bucket       = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket
+  key          = each.value
+  source       = "../html/${each.value}"
+  content_type = "text/html"
+  etag         = filemd5("../html/${each.value}")
 }
 
 resource "aws_s3_object" "object-upload-css" {
-    for_each        = fileset("../html/", "*.css")
-    bucket          = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket
-    key             = each.value
-    source          = "../html/${each.value}"
-    content_type    = "text/css "
-    etag            = filemd5("../html/${each.value}")
+  for_each     = fileset("../html/", "*.css")
+  bucket       = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket
+  key          = each.value
+  source       = "../html/${each.value}"
+  content_type = "text/css "
+  etag         = filemd5("../html/${each.value}")
 }
 
 

@@ -18,3 +18,7 @@ variable "amiID" {
 variable "rootDomainName" {
   default = "lucian-cibu.xyz"
 }
+
+variable "tableName" {
+  default = "resume-lucian-cibu-dynamodb-terraform"
+}
