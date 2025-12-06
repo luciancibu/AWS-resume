@@ -1,10 +1,9 @@
 resource "aws_instance" "Jenkins_terraform" {
-  ami                    = data.aws_ami.amiID.id
+  ami                    = var.amiID
   instance_type          = "t2.medium"
   key_name               = aws_key_pair.Jenkins_terraform-key.key_name
   vpc_security_group_ids = [aws_security_group.Jenkins_terraform-sg.id]
-  availability_zone      = "us-east-1a"
-
+  availability_zone      = var.zone
   tags = {
     Name    = "Jenkins_terraform"
     Project = "Jenkins_terraform"
