@@ -1,5 +1,4 @@
 _tests/
-ReadMe.md
 Terraform/.terraform/
 Terraform/terraform.tfstate
 Terraform/*.txt
