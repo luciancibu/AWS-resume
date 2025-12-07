@@ -18,11 +18,6 @@ resource "aws_instance" "Jenkins_terraform" {
     destination = "/tmp/setup_Jenkins.sh"
   }
 
-  provisioner "file" {
-    source      = "setup_Jenkins.sh"
-    destination = "/tmp/setup_Jenkins.sh"
-  }
-
   connection {
     type        = "ssh"
     user        = var.user
@@ -33,8 +28,8 @@ resource "aws_instance" "Jenkins_terraform" {
   provisioner "remote-exec" {
 
     inline = [
-      "chmod +x /tmp/setup_Jenkins.sh",
-      "sudo /tmp/setup_Jenkins.sh"
+    "chmod +x /tmp/setup_Jenkins.sh",
+    "sudo /tmp/setup_Jenkins.sh"
     ]
   }
 
@@ -46,5 +41,5 @@ resource "aws_ec2_instance_state" "Jenkins_terraform-state" {
 }
 
 output "JenkinsPublicIP" {
-  value = aws_instance.Jenkins_terraform.public_ip  
+  value = aws_instance.Jenkins_terraform.public_ip
 }

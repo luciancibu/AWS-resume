@@ -1,6 +1,8 @@
 # Documentation References:
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_role" "resume_lucian_cibu_lambda_role_terraform" {
   name = "resume-lucian-cibu-lambda-role-terraform"
 
@@ -32,7 +34,7 @@ resource "aws_iam_role_policy" "resume_lucian_cibu_lambda_policy_terraform" {
           "dynamodb:PutItem",
           "dynamodb:UpdateItem"
         ],
-        Resource = "arn:aws:dynamodb:us-east-1:*:table/resume-lucian-cibu"
+        Resource = "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.tableName}"
       }
     ]
   })
