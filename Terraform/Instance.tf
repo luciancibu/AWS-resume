@@ -40,8 +40,11 @@ resource "aws_instance" "Jenkins_terraform" {
 
 }
 
-
 resource "aws_ec2_instance_state" "Jenkins_terraform-state" {
   instance_id = aws_instance.Jenkins_terraform.id
   state       = "running"
+}
+
+output "JenkinsPublicIP" {
+  value = aws_instance.Jenkins_terraform.public_ip  
 }
