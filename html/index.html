@@ -83,8 +83,9 @@
                     <h3>Familiar With</h3>
                     <ul>
                         <li>AWS (EC2, S3, IAM etc.)</li>
-                        <li>Terraform (IaC)</li>
-                        <li>CI/CD: GitHub Actions, Jenkins, GitLab</li>
+                        <li>Terraform (IaC) & Ansible</li>
+                        <li>CI/CD: GitHub Actions, Jenkins</li>
+                        <li>Monitoring & Logging: Prometheus, Grafana, Loki, CloudWatch</li>
                     </ul>
                 </div>
 
@@ -148,54 +149,98 @@
 
 
         <!-- EDUCATION + PROJECTS -->
-        <section class="section">
-            <h2 class="section-title">Education & Projects</h2>
+<!-- EDUCATION -->
+<section class="section">
+    <h2 class="section-title">Education</h2>
 
-            <!-- Education -->
-            <article class="experience-item">
-                <div class="experience-header">
-                    <div>
-                        <h3>Technical University of Cluj-Napoca – Faculty ETTI</h3>
-                        <p class="exp-location">Cluj-Napoca, Romania</p>
-                    </div>
-                </div>
+    <article class="experience-item">
+        <div class="experience-header">
+            <div>
+                <h3>Technical University of Cluj-Napoca – Faculty ETTI</h3>
+                <p class="exp-location">Cluj-Napoca, Romania</p>
+            </div>
+        </div>
 
-                <ul>
-                    <li>
-                        <strong>Master in Multimedia Technologies (2022 – 2024)</strong><br>
-                        Thesis: <em>Deployment of a Vision-Language Model on Embedded SoCs for traffic scene understanding</em>.
-                    </li>
-                    <li>
-                        <strong>Bachelor in Telecommunications Systems (2018 – 2022)</strong><br>
-                        Thesis: <em>Intelligent System for Traffic Sign Detection and Recognition</em> (Python, OpenCV).
-                    </li>
-                </ul>
-            </article>
+        <ul>
+            <li>
+                <strong>Master in Multimedia Technologies (2022 – 2024)</strong><br>
+                Thesis: <em>Deployment of a Vision-Language Model on Embedded SoCs for traffic scene understanding</em>.
+            </li>
+            <li>
+                <strong>Bachelor in Telecommunications Systems (2018 – 2022)</strong><br>
+                Thesis: <em>Intelligent System for Traffic Sign Detection and Recognition</em> (Python, OpenCV).
+            </li>
+        </ul>
+    </article>
+</section>
 
+<!-- PROJECTS -->
+<section class="section">
+    <h2 class="section-title">Projects</h2>
 
-            <!-- Projects -->
-            <article class="project-item">
-                <h3>Serverless AWS Resume Website</h3>
-                <p>
-                    Deployed a fully automated resume website using AWS S3, CloudFront, DynamoDB, Lambda, Terraform,
-                    and CI/CD pipelines through GitHub Actions and Jenkins.
-                    <br>
-                    <a href="https://github.com/luciancibu/AWS-resume" target="_blank">(GitHub Repository)</a>
-                </p>
-            </article>
+    <article class="project-item">
+        <h3>Serverless AWS Resume Website</h3>
+        <p>
+            Deployed a fully automated resume website using AWS S3, CloudFront, DynamoDB, Lambda, Terraform,
+            and CI/CD pipelines through GitHub Actions and Jenkins.
+            <br>
+            <a href="https://github.com/luciancibu/AWS-resume" target="_blank">(GitHub Repository)</a>
+        </p>
+    </article>
 
-            <article class="project-item">
-                <h3>Selenium Reservation Server (Home Assistant Integration)</h3>
-                <p>
-                    Automated sports field booking on <strong>calendis.ro</strong> using Selenium + Chromium in Docker,
-                    integrated with Home Assistant.
-                    <br>
-                    <a href="https://github.com/luciancibu/home-assistant-selenium-docker" target="_blank">
-                        (GitHub Repository)
-                    </a>
-                </p>
-            </article>
-        </section>
+    <article class="project-item">
+        <h3>AWS Monitoring & Observability Stack (Terraform & Ansible)</h3>
+        <p>
+            Built a full AWS monitoring and observability stack using <strong>Terraform</strong> and <strong>Ansible</strong>,
+            integrating Prometheus, Grafana, Loki, and Node Exporter for metrics and logs collection.
+            <br>
+            <a href="https://github.com/luciancibu/aws-monitoring" target="_blank">(GitHub Repository)</a>
+        </p>
+    </article>
+
+    <article class="project-item">
+        <h3>AWS Multi-VPC Architecture (Terraform)</h3>
+        <p>
+            Deployed a multi-VPC AWS application using <strong>Terraform</strong>, featuring
+            a public Application Load Balancer, an Nginx reverse proxy, a Flask backend hosted in a separate VPC,
+            and a private RDS database. Frontend and backend are deployed in separate VPCs with controlled
+            communication via VPC peering.
+            <br>
+            <a href="https://github.com/luciancibu/aws-multi-vpc-architecture" target="_blank">(GitHub Repository)</a>
+        </p>
+    </article>
+
+    <article class="project-item">
+        <h3>AWS Terraform, Ansible & CI/CD Automation</h3>
+        <p>
+            Provisioned AWS infrastructure with <strong>Terraform</strong> and automated EC2 configuration
+            using <strong>Ansible</strong>, executed through a CI/CD pipeline.
+            <br>
+            <a href="https://github.com/luciancibu/aws-terraform-ansible-cicd" target="_blank">(GitHub Repository)</a>
+        </p>
+    </article>
+
+    <article class="project-item">
+        <h3>AWS CloudWatch Logs Basics</h3>
+        <p>
+            Implemented a basic AWS logging setup using <strong>CloudWatch Logs</strong> to collect
+            and inspect application log data.
+            <br>
+            <a href="https://github.com/luciancibu/aws-cloudwatch-logs" target="_blank">(GitHub Repository)</a>
+        </p>
+    </article>
+
+    <article class="project-item">
+        <h3>Selenium Reservation Server (Home Assistant Integration)</h3>
+        <p>
+            Automated sports field booking on <strong>calendis.ro</strong> using Selenium + Chromium in Docker,
+            integrated with Home Assistant.
+            <br>
+            <a href="https://github.com/luciancibu/home-assistant-selenium-docker" target="_blank">(GitHub Repository)</a>
+        </p>
+    </article>
+</section>
+
     </main>
     <div class="views">
         <p id="view-counter">Loading views...</p>
