@@ -83,11 +83,13 @@
                     <h3>Familiar With</h3>
                     <ul>
                         <li>AWS (EC2, S3, IAM etc.)</li>
-                        <li>Terraform (IaC) & Ansible</li>
+                        <li>Kubernetes (EKS)</li>
+                        <li>Infrastructure as Code: Terraform, Ansible</li>
                         <li>CI/CD: GitHub Actions, Jenkins</li>
                         <li>Monitoring & Logging: Prometheus, Grafana, Loki, CloudWatch</li>
                     </ul>
                 </div>
+
 
                 <div class="skill-block">
                     <h3>Other</h3>
@@ -189,19 +191,9 @@
     </article>
 
     <article class="project-item">
-        <h3>AWS Monitoring & Observability Stack (Terraform & Ansible)</h3>
-        <p>
-            Built a full AWS monitoring and observability stack using <strong>Terraform</strong> and <strong>Ansible</strong>,
-            integrating Prometheus, Grafana, Loki, and Node Exporter for metrics and logs collection.
-            <br>
-            <a href="https://github.com/luciancibu/aws-monitoring" target="_blank">(GitHub Repository)</a>
-        </p>
-    </article>
-
-    <article class="project-item">
         <h3>AWS Multi-VPC Architecture (Terraform)</h3>
         <p>
-            Deployed a multi-VPC AWS application using <strong>Terraform</strong>, featuring
+            Deployed a multi-VPC AWS application using Terraform, featuring
             a public Application Load Balancer, an Nginx reverse proxy, a Flask backend hosted in a separate VPC,
             and a private RDS database. Frontend and backend are deployed in separate VPCs with controlled
             communication via VPC peering.
@@ -211,34 +203,82 @@
     </article>
 
     <article class="project-item">
+        <h3>AWS EKS GitOps Deployment (Terraform & GitHub Actions)</h3>
+        <p>
+            Cloud-native application deployed on AWS EKS, with a Git-based separation between application delivery and infrastructure provisioning.
+            <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <strong>• Application (EKS, ECR):</strong><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Resume application containerized and deployed to EKS, with Docker images built
+            and pushed to ECR via GitHub Actions, enabling automated build
+            and deployment workflows.
+            <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="https://github.com/luciancibu/gitops-resume-action" target="_blank">(GitHub Repository)</a>
+            <br>
+
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <strong>• Infrastructure (Terraform, EKS, VPC):</strong><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            AWS infrastructure provisioned with Terraform, including EKS
+            and VPC resources, managed via Git-based workflows.
+            <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="https://github.com/luciancibu/gitops-resume-iac" target="_blank">(GitHub Repository)</a>
+        </p>
+        </article>
+
+        <article class="project-item">
+            <h3>AWS ECS Flask + Nginx + RDS Architecture</h3>
+            <p>
+                Deployed a containerized Flask and Nginx application on ECS,
+                using an Application Load Balancer and an RDS backend, with Docker images
+                built and pushed to Docker Hub, fully provisioned with
+                Terraform.
+                <br>
+                <a href="https://github.com/luciancibu/aws-ecs-flask-nginx-rds" target="_blank">(GitHub Repository)</a>
+            </p>
+        </article>    
+    
+    <article class="project-item">
+        <h3>AWS Monitoring & Observability Stack (Terraform & Ansible)</h3>
+        <p>
+            Built a full AWS monitoring and observability stack using Terraform and Ansible,
+            integrating Prometheus, Grafana, Loki, and Node Exporter for metrics and logs collection.
+            <br>
+            <a href="https://github.com/luciancibu/aws-monitoring" target="_blank">(GitHub Repository)</a>
+        </p>
+    </article>
+
+        <article class="project-item">
         <h3>AWS Terraform, Ansible & CI/CD Automation</h3>
         <p>
-            Provisioned AWS infrastructure with <strong>Terraform</strong> and automated EC2 configuration
-            using <strong>Ansible</strong>, executed through a CI/CD pipeline.
+            Provisioned AWS infrastructure with Terraform and automated EC2 configuration
+            using Ansible, executed through a CI/CD pipeline.
             <br>
             <a href="https://github.com/luciancibu/aws-terraform-ansible-cicd" target="_blank">(GitHub Repository)</a>
         </p>
     </article>
+        <article class="project-item">
+            <h3>AWS CloudWatch Logs Basics</h3>
+            <p>
+                Implemented a basic AWS logging setup using CloudWatch Logs to collect
+                and inspect application log data.
+                <br>
+                <a href="https://github.com/luciancibu/aws-cloudwatch-logs" target="_blank">(GitHub Repository)</a>
+            </p>
+        </article>
 
-    <article class="project-item">
-        <h3>AWS CloudWatch Logs Basics</h3>
-        <p>
-            Implemented a basic AWS logging setup using <strong>CloudWatch Logs</strong> to collect
-            and inspect application log data.
-            <br>
-            <a href="https://github.com/luciancibu/aws-cloudwatch-logs" target="_blank">(GitHub Repository)</a>
-        </p>
-    </article>
-
-    <article class="project-item">
-        <h3>Selenium Reservation Server (Home Assistant Integration)</h3>
-        <p>
-            Automated sports field booking on <strong>calendis.ro</strong> using Selenium + Chromium in Docker,
-            integrated with Home Assistant.
-            <br>
-            <a href="https://github.com/luciancibu/home-assistant-selenium-docker" target="_blank">(GitHub Repository)</a>
-        </p>
-    </article>
+        <article class="project-item">
+            <h3>Selenium Reservation Server (Home Assistant Integration)</h3>
+            <p>
+                Automated sports field booking on calendis.ro using Selenium + Chromium in Docker,
+                integrated with Home Assistant.
+                <br>
+                <a href="https://github.com/luciancibu/home-assistant-selenium-docker" target="_blank">(GitHub Repository)</a>
+            </p>
+        </article>      
 </section>
 
     </main>
