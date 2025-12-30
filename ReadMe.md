@@ -44,10 +44,11 @@ AWS-resume/
 ## Infrastructure Overview (Terraform)
 
 ### 1. S3 Static Website Hosting  
-Terraform configures a public S3 bucket for hosting the resume website.
+Terraform provisions a private S3 bucket that stores the static website assets (HTML/CSS).
+The bucket does not use S3 Static Website Hosting and is accessible only via CloudFront.
 
 ### 2. CloudFront Distribution  
-CloudFront provides HTTPS and custom domain support.
+CloudFront serves the website over HTTPS, provides custom domain support, and securely accesses the private S3 bucket using Origin Access Control (OAC).
 
 ### 3. DynamoDB View Counter  
 Stores the number of visits using an item with key `{ id: "views" }`.

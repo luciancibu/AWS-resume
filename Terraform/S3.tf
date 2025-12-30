@@ -12,17 +12,6 @@ resource "aws_s3_bucket" "resume-lucian-cibu-s3-terraform" {
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "resume-lucian-cibu-s3-terraform" {
-  bucket = aws_s3_bucket.resume-lucian-cibu-s3-terraform.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "error.html"
-  }
-}
 
 resource "aws_s3_bucket_versioning" "resume-lucian-cibu-s3-terraform_versioning" {
   bucket = aws_s3_bucket.resume-lucian-cibu-s3-terraform.id
@@ -34,33 +23,41 @@ resource "aws_s3_bucket_versioning" "resume-lucian-cibu-s3-terraform_versioning"
 resource "aws_s3_bucket_public_access_block" "resume-lucian-cibu-s3-terraform_access_block" {
   bucket = aws_s3_bucket.resume-lucian-cibu-s3-terraform.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_policy" "bucket-policy" {
-  bucket = aws_s3_bucket.resume-lucian-cibu-s3-terraform.id
-  policy = data.aws_iam_policy_document.iam-ss3-bucket-resume-terraform.json
-}
-data "aws_iam_policy_document" "iam-ss3-bucket-resume-terraform" {
+data "aws_iam_policy_document" "s3_allow_cloudfront_oac" {
   statement {
-    sid    = "AllowPublicRead"
-    effect = "Allow"
+    sid     = "AllowCloudFrontOAC"
+    effect  = "Allow"
+    actions = ["s3:GetObject"]
     resources = [
-      "arn:aws:s3:::resume-lucian-cibu-s3-terraform",
-      "arn:aws:s3:::resume-lucian-cibu-s3-terraform/*",
+      "arn:aws:s3:::resume-lucian-cibu-s3-terraform/*"
     ]
-    actions = ["S3:GetObject"]
+
     principals {
-      type        = "*"
-      identifiers = ["*"]
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values = [
+        aws_cloudfront_distribution.resume_distribution.arn
+      ]
     }
   }
-
-  depends_on = [aws_s3_bucket_public_access_block.resume-lucian-cibu-s3-terraform_access_block]
 }
+
+resource "aws_s3_bucket_policy" "resume_policy" {
+  bucket = aws_s3_bucket.resume-lucian-cibu-s3-terraform.id
+  policy = data.aws_iam_policy_document.s3_allow_cloudfront_oac.json
+}
+
 
 resource "aws_s3_object" "object-upload-html" {
   for_each     = fileset("../html/", "*.html")
@@ -76,7 +73,7 @@ resource "aws_s3_object" "object-upload-css" {
   bucket       = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket
   key          = each.value
   source       = "../html/${each.value}"
-  content_type = "text/css "
+  content_type = "text/css"
   etag         = filemd5("../html/${each.value}")
 }
 

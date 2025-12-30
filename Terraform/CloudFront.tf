@@ -1,6 +1,14 @@
 # Documentation References:
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution
 
+resource "aws_cloudfront_origin_access_control" "resume_oac" {
+  name                              = "resume-s3-oac"
+  description                       = "OAC for resume S3 bucket"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 data "aws_acm_certificate" "lucian-cibu-xyz" {
   domain      = "*.${var.rootDomainName}"
   statuses    = ["ISSUED"]
@@ -16,40 +24,38 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
   default_root_object = "index.html"
 
   origin {
-    domain_name = aws_s3_bucket_website_configuration.resume-lucian-cibu-s3-terraform.website_endpoint
-    origin_id   = "s3-resume-origin-terraform"
+    domain_name = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket_regional_domain_name
+    origin_id   = "s3-resume-origin"
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+    origin_access_control_id = aws_cloudfront_origin_access_control.resume_oac.id
+
+    s3_origin_config {
+      origin_access_identity = ""
     }
   }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "s3-resume-origin-terraform"
+    target_origin_id = "s3-resume-origin"
+
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
 
     forwarded_values {
       query_string = false
-
       cookies {
         forward = "none"
       }
     }
-    compress = true
 
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    min_ttl     = 0
+    default_ttl = 3600
+    max_ttl     = 86400
   }
 
-
+  price_class = "PriceClass_100"
   http_version = "http2and3"
-  price_class  = "PriceClass_100"
 
   restrictions {
     geo_restriction {
@@ -64,7 +70,7 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
   }
 
   tags = {
-    Name    = "resume-lucian-cibu-CloudFront-terraform"
+    Name    = "resume-lucian-cibu-cloudfront"
     Project = "resume-lucian-cibu"
   }
 }
