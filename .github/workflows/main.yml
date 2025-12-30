@@ -7,7 +7,7 @@ on:
 env:
   LAMBDA_FUNCTION: lucian-cibu-resume-lambda-terraform
   S3_BUCKET: resume-lucian-cibu-s3-terraform
-  CLOUDFRONT_DISTRIBUTION_ID: E1NA1BA9KZIRR4
+  CLOUDFRONT_DISTRIBUTION_ID: EDGGVY01J7KZW
   AWS_REGION: us-east-1
 jobs:
   deploy:
