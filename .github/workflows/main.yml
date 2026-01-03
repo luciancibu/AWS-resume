@@ -65,7 +65,7 @@ jobs:
             --zip-file fileb://Lambda.zip
 
   deploy_terraform:
-    # if: contains(github.event.head_commit.modified, 'Terraform/')
+    if: contains(github.event.head_commit.modified, 'Terraform/')
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -87,7 +87,7 @@ jobs:
           terraform_version: 1.6.6
 
       - name: Terraform init
-        run: terraform init -backend-config="bucket=$S3_BUCKET_TF_STATE"          
+        run: terraform init
 
       - name: Terraform format
         run: terraform fmt -check
