@@ -2,28 +2,52 @@ name: Deploy to S3 and Invalidate CloudFront
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
+    paths:
+      - html/**
+      - Lambda/**
   workflow_dispatch:
 env:
   LAMBDA_FUNCTION: lambda-terraform
   S3_BUCKET: s3-terraform-083971419667
   CLOUDFRONT_DISTRIBUTION_ID: E1XEREO1WT2D9H
   AWS_REGION: us-east-1
+
 jobs:
-  deploy:
+  deploy_html:
+    if: contains(github.event.head_commit.modified, 'html/')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Zip Lambda function
+      - name: Sync HTML to S3
+        run: aws s3 sync html/ s3://${{ env.S3_BUCKET }}/ --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+  deploy_lambda:
+    if: contains(github.event.head_commit.modified, 'Lambda/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Zip Lambda
         run: |
           cd Lambda
           zip -r ../Lambda.zip .
@@ -33,13 +57,3 @@ jobs:
           aws lambda update-function-code \
             --function-name ${{ env.LAMBDA_FUNCTION }} \
             --zip-file fileb://Lambda.zip
-
-      - name: Sync files to S3
-        run: |
-          aws s3 sync html/ s3://${{ env.S3_BUCKET }}/ --delete
-
-      - name: Invalidate CloudFront
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
