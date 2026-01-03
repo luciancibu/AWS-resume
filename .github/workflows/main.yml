@@ -142,10 +142,7 @@ jobs:
           terraform_version: 1.6.6
 
       - name: Terraform init
-        run: terraform init \
-            -backend-config="bucket=$S3_BUCKET_TF_STATE" \
-            -backend-config="key=resume/terraform.tfstate" \
-            -backend-config="region=$AWS_REGION"
+        run: terraform init 
 
       - name: Terraform format
         run: terraform fmt -check

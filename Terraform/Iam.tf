@@ -45,9 +45,25 @@ resource "aws_iam_role_policy" "lambda_policy_terraform" {
           "logs:DescribeLogStreams"
         ],
         Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.resume_lambda.function_name}:*"
+      },
+
+      {
+        Effect   = "Allow",
+        Action   = "sns:Publish",
+        Resource = "arn:aws:sns:${var.region}:${data.aws_caller_identity.current.account_id}:${aws_sns_topic.resume_sns_topic.name}"
       }
     ]
   })
+}
+
+resource "aws_sns_topic" "resume_sns_topic" {
+  name = "SNS-resume"
+}
+
+resource "aws_sns_topic_subscription" "resume_email_sub" {
+  topic_arn = aws_sns_topic.resume_sns_topic.arn
+  protocol  = "email"
+  endpoint  = "luciancibu@yahoo.com"
 }
 
 data "aws_iam_policy_document" "s3_allow_cloudfront_oac" {
