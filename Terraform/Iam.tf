@@ -3,8 +3,8 @@
 
 data "aws_caller_identity" "current" {}
 
-resource "aws_iam_role" "resume_lucian_cibu_lambda_role_terraform" {
-  name = "resume-lucian-cibu-lambda-role-terraform"
+resource "aws_iam_role" "lambda_role_terraform" {
+  name = "lambda-role-terraform"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -20,9 +20,9 @@ resource "aws_iam_role" "resume_lucian_cibu_lambda_role_terraform" {
   })
 }
 
-resource "aws_iam_role_policy" "resume_lucian_cibu_lambda_policy_terraform" {
-  name = "resume-lucian-cibu-lambda-policy-terraform"
-  role = aws_iam_role.resume_lucian_cibu_lambda_role_terraform.id
+resource "aws_iam_role_policy" "lambda_policy_terraform" {
+  name = "lambda-policy-terraform"
+  role = aws_iam_role.lambda_role_terraform.id
 
   policy = jsonencode({
     Version = "2012-10-17"

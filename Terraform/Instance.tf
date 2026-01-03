@@ -10,7 +10,7 @@ resource "aws_instance" "Jenkins_terraform" {
   availability_zone      = var.zone
   tags = {
     Name    = "Jenkins_terraform"
-    Project = "resume-lucian-cibu"
+    Project = "resume"
   }
 
   provisioner "file" {

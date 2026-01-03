@@ -20,5 +20,5 @@ variable "rootDomainName" {
 }
 
 variable "tableName" {
-  default = "resume-lucian-cibu-dynamodb-terraform"
+  default = "dynamodb-terraform"
 }

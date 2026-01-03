@@ -9,12 +9,12 @@ data "archive_file" "python_lambda_package" {
 }
 
 resource "aws_lambda_function" "resume_lambda" {
-  function_name = "lucian-cibu-resume-lambda-terraform"
+  function_name = "lambda-terraform"
 
   handler = "lambda_function.lambda_handler"
   runtime = "python3.12"
 
-  role = aws_iam_role.resume_lucian_cibu_lambda_role_terraform.arn
+  role = aws_iam_role.lambda_role_terraform.arn
 
   filename         = data.archive_file.python_lambda_package.output_path
   source_code_hash = data.archive_file.python_lambda_package.output_base64sha256

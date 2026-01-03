@@ -12,8 +12,8 @@ resource "aws_dynamodb_table" "basic_dynamodb_table" {
   }
 
   tags = {
-    Name        = "resume-lucian-cibu-dynamodb-terraform"
-    Environment = "resume-lucian-cibu"
+    Name        = "dynamodb-terraform"
+    Environment = "resume"
   }
 }
 

@@ -24,7 +24,7 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
   default_root_object = "index.html"
 
   origin {
-    domain_name = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket_regional_domain_name
+    domain_name = aws_s3_bucket.s3-terraform.bucket_regional_domain_name
     origin_id   = "s3-resume-origin"
 
     origin_access_control_id = aws_cloudfront_origin_access_control.resume_oac.id
@@ -70,7 +70,7 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
   }
 
   tags = {
-    Name    = "resume-lucian-cibu-cloudfront"
-    Project = "resume-lucian-cibu"
+    Name    = "cloudfront"
+    Project = "resume"
   }
 }

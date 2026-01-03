@@ -1,7 +1,7 @@
 import json
 import boto3
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('resume-lucian-cibu-dynamodb-terraform')
+table = dynamodb.Table('dynamodb-terraform')
 ITEM_ID = 'views'
 
 def lambda_handler(event, context):

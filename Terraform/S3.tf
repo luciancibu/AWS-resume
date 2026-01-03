@@ -3,25 +3,25 @@
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_website_configuration
 # https://medium.com/@frankpromiseedah/hosting-a-static-website-on-aws-s3-using-terraform-e12addd22d18
 
-resource "aws_s3_bucket" "resume-lucian-cibu-s3-terraform" {
-  bucket = "resume-lucian-cibu-s3-terraform"
+resource "aws_s3_bucket" "s3-terraform" {
+  bucket = "s3-terraform"
 
   tags = {
-    Name    = "resume-lucian-cibu-s3-terraform"
-    Project = "resume-lucian-cibu"
+    Name    = "s3-terraform"
+    Project = "resume"
   }
 }
 
 
-resource "aws_s3_bucket_versioning" "resume-lucian-cibu-s3-terraform_versioning" {
-  bucket = aws_s3_bucket.resume-lucian-cibu-s3-terraform.id
+resource "aws_s3_bucket_versioning" "s3-terraform_versioning" {
+  bucket = aws_s3_bucket.s3-terraform.id
   versioning_configuration {
     status = "Disabled"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "resume-lucian-cibu-s3-terraform_access_block" {
-  bucket = aws_s3_bucket.resume-lucian-cibu-s3-terraform.id
+resource "aws_s3_bucket_public_access_block" "s3-terraform_access_block" {
+  bucket = aws_s3_bucket.s3-terraform.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "s3_allow_cloudfront_oac" {
     effect  = "Allow"
     actions = ["s3:GetObject"]
     resources = [
-      "arn:aws:s3:::resume-lucian-cibu-s3-terraform/*"
+      "arn:aws:s3:::s3-terraform/*"
     ]
 
     principals {
@@ -54,14 +54,14 @@ data "aws_iam_policy_document" "s3_allow_cloudfront_oac" {
 }
 
 resource "aws_s3_bucket_policy" "resume_policy" {
-  bucket = aws_s3_bucket.resume-lucian-cibu-s3-terraform.id
+  bucket = aws_s3_bucket.s3-terraform.id
   policy = data.aws_iam_policy_document.s3_allow_cloudfront_oac.json
 }
 
 
 resource "aws_s3_object" "object-upload-html" {
   for_each     = fileset("../html/", "*.html")
-  bucket       = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket
+  bucket       = aws_s3_bucket.s3-terraform.bucket
   key          = each.value
   source       = "../html/${each.value}"
   content_type = "text/html"
@@ -70,7 +70,7 @@ resource "aws_s3_object" "object-upload-html" {
 
 resource "aws_s3_object" "object-upload-css" {
   for_each     = fileset("../html/", "*.css")
-  bucket       = aws_s3_bucket.resume-lucian-cibu-s3-terraform.bucket
+  bucket       = aws_s3_bucket.s3-terraform.bucket
   key          = each.value
   source       = "../html/${each.value}"
   content_type = "text/css"
