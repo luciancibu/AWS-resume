@@ -22,3 +22,7 @@ variable "rootDomainName" {
 variable "tableName" {
   default = "dynamodb-terraform"
 }
+
+variable "accID" {
+  default = "083971419667"
+}

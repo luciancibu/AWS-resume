@@ -35,6 +35,16 @@ resource "aws_iam_role_policy" "lambda_policy_terraform" {
           "dynamodb:UpdateItem"
         ],
         Resource = "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.tableName}"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ],
+        Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.resume_lambda.function_name}:*"
       }
     ]
   })
@@ -46,7 +56,7 @@ data "aws_iam_policy_document" "s3_allow_cloudfront_oac" {
     effect  = "Allow"
     actions = ["s3:GetObject"]
     resources = [
-      "arn:aws:s3:::s3-terraform/*"
+      "arn:aws:s3:::${aws_s3_bucket.s3-terraform.bucket}/*"
     ]
 
     principals {
