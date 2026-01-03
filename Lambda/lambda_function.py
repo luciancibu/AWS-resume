@@ -30,3 +30,4 @@ def lambda_handler(event, context):
         },
         "body": str(views)
     }
+
