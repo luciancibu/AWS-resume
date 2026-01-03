@@ -58,24 +58,29 @@ Lambda is granted read/write privileges on DynamoDB.
 
 ### 5. Lambda Function (Python)  
 Serverless backend increments and returns the website view counter.
+The Lambda function is invoked through API Gateway (HTTP API) and is not publicly exposed.
 
-### 6. EC2 Jenkins Server  
+### 6. API Gateway (HTTP API)
+Provides a public HTTPS endpoint for the Lambda function, handling request routing and access control.
+The frontend calls API Gateway instead of invoking Lambda directly.
+
+### 7. EC2 Jenkins Server  
 Terraform provisions an EC2 instance with Jenkins installed via a bootstrap script.
 
-### 7. Security Groups  
+### 8. Security Groups  
 SSH limited to your IP, Jenkins exposed on port 8080.
 
-### 8. GitHub Actions CI/CD  
+### 9. GitHub Actions CI/CD  
 Deploys the frontend, backend, and invalidates CloudFront cache automatically on push.
 
-### 9. Jenkins CI/CD  
+### 10. Jenkins CI/CD  
 Additional CI/CD pipeline executing Lambda + S3 + CloudFront updates.
 
 ## Deployment Flow
 
 ```
 User → CloudFront → S3 (Static Site)
-                 ↘ Lambda → DynamoDB
+                 ↘ API Gateway → Lambda → DynamoDB
 ```
 
 CI/CD:
@@ -99,6 +104,6 @@ This project demonstrates:
 - AWS serverless architecture
 - Infrastructure as Code using Terraform
 - Two CI/CD pipelines (GitHub Actions & Jenkins)
+- API Gateway used as a secure public entry point for Lambda
 - Dynamic backend using Lambda + DynamoDB
 - Automated CloudFront cache invalidation
-- Production-level DevOps workflow

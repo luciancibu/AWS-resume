@@ -290,18 +290,25 @@
 
 <script>
 async function updateCounter() {
-    if (!sessionStorage.getItem("counted")) {
+    const baseUrl = "https://bxj56szvwk.execute-api.us-east-1.amazonaws.com/view";
+    const counted = sessionStorage.getItem("counted");
 
-        let response = await fetch("https://gadzzccj4op3yivtyd6jedseau0fvpie.lambda-url.us-east-1.on.aws/");
-        let data = await response.text();
+    try {
+        const url = counted
+            ? `${baseUrl}?read=true`
+            : baseUrl;
+
+        const response = await fetch(url);
+        const data = await response.text();
+
         document.getElementById("view-counter").innerHTML = `Views: ${data}`;
 
-        sessionStorage.setItem("counted", "true");
-
-    } else {
-        let response = await fetch("https://gadzzccj4op3yivtyd6jedseau0fvpie.lambda-url.us-east-1.on.aws/?read=true");
-        let data = await response.text();
-        document.getElementById("view-counter").innerHTML = `Views: ${data}`;
+        if (!counted) {
+            sessionStorage.setItem("counted", "true");
+        }
+    } catch (err) {
+        document.getElementById("view-counter").innerHTML = "Views: N/A";
+        console.error("View counter error:", err);
     }
 }
 

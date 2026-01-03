@@ -21,8 +21,3 @@ resource "aws_lambda_function" "resume_lambda" {
 
   timeout = 5
 }
-
-resource "aws_lambda_function_url" "example" {
-  function_name      = aws_lambda_function.resume_lambda.function_name
-  authorization_type = "NONE"
-}

@@ -4,7 +4,7 @@
 # https://medium.com/@frankpromiseedah/hosting-a-static-website-on-aws-s3-using-terraform-e12addd22d18
 
 resource "aws_s3_bucket" "s3-terraform" {
-  bucket = "s3-terraform"
+  bucket = "s3-terraform-${var.accID}"
 
   tags = {
     Name    = "s3-terraform"

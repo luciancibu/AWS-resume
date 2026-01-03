@@ -2,7 +2,7 @@
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution
 
 resource "aws_cloudfront_origin_access_control" "resume_oac" {
-  name                              = "resume-s3-oac"
+  name                              = "resume-oac-s3"
   description                       = "OAC for resume S3 bucket"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"

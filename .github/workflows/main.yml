@@ -5,9 +5,9 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 env:
-  LAMBDA_FUNCTION: lucian-cibu-resume-lambda-terraform
-  S3_BUCKET: resume-lucian-cibu-s3-terraform
-  CLOUDFRONT_DISTRIBUTION_ID: EDGGVY01J7KZW
+  LAMBDA_FUNCTION: lambda-terraform
+  S3_BUCKET: s3-terraform-083971419667
+  CLOUDFRONT_DISTRIBUTION_ID: E1XEREO1WT2D9H
   AWS_REGION: us-east-1
 jobs:
   deploy:
