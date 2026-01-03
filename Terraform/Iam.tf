@@ -40,5 +40,31 @@ resource "aws_iam_role_policy" "lambda_policy_terraform" {
   })
 }
 
+data "aws_iam_policy_document" "s3_allow_cloudfront_oac" {
+  statement {
+    sid     = "AllowCloudFrontOAC"
+    effect  = "Allow"
+    actions = ["s3:GetObject"]
+    resources = [
+      "arn:aws:s3:::s3-terraform/*"
+    ]
 
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
 
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values = [
+        aws_cloudfront_distribution.resume_distribution.arn
+      ]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "resume_policy" {
+  bucket = aws_s3_bucket.s3-terraform.id
+  policy = data.aws_iam_policy_document.s3_allow_cloudfront_oac.json
+}

@@ -29,36 +29,6 @@ resource "aws_s3_bucket_public_access_block" "s3-terraform_access_block" {
   restrict_public_buckets = true
 }
 
-data "aws_iam_policy_document" "s3_allow_cloudfront_oac" {
-  statement {
-    sid     = "AllowCloudFrontOAC"
-    effect  = "Allow"
-    actions = ["s3:GetObject"]
-    resources = [
-      "arn:aws:s3:::s3-terraform/*"
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values = [
-        aws_cloudfront_distribution.resume_distribution.arn
-      ]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "resume_policy" {
-  bucket = aws_s3_bucket.s3-terraform.id
-  policy = data.aws_iam_policy_document.s3_allow_cloudfront_oac.json
-}
-
-
 resource "aws_s3_object" "object-upload-html" {
   for_each     = fileset("../html/", "*.html")
   bucket       = aws_s3_bucket.s3-terraform.bucket
