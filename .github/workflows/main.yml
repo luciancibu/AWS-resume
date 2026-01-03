@@ -16,8 +16,29 @@ env:
   AWS_REGION: us-east-1
 
 jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      html: ${{ steps.filter.outputs.html }}
+      lambda: ${{ steps.filter.outputs.lambda }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            html:
+              - 'html/**'
+            lambda:
+              - 'Lambda/**'
+            terraform:
+              - 'Terraform/**'
+
   deploy_html:
-    if: contains(github.event.head_commit.modified, 'html/')
+    needs: detect_changes
+    if: needs.detect_changes.outputs.html == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code    
@@ -40,7 +61,8 @@ jobs:
             --paths "/*"
 
   deploy_lambda:
-    if: contains(github.event.head_commit.modified, 'Lambda/')
+    needs: detect_changes
+    if: needs.detect_changes.outputs.lambda == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code    
@@ -65,7 +87,8 @@ jobs:
             --zip-file fileb://Lambda.zip
 
   deploy_terraform:
-    if: contains(github.event.head_commit.modified, 'Terraform/')
+    needs: detect_changes
+    if: needs.detect_changes.outputs.terraform == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
