@@ -1,0 +1,9 @@
+[MASTER]
+ignore=venv
+
+[MESSAGES CONTROL]
+disable=
+    import-error,
+    unused-argument,
+    missing-module-docstring,
+    missing-function-docstring

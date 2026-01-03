@@ -1,8 +1,8 @@
-import json
 import boto3
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('dynamodb-terraform')
 ITEM_ID = 'views'
+
 
 def lambda_handler(event, context):
     params = event.get("queryStringParameters") or {}
@@ -30,4 +30,3 @@ def lambda_handler(event, context):
         },
         "body": str(views)
     }
-
