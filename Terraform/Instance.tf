@@ -18,12 +18,12 @@
 #     destination = "/tmp/setup_Jenkins.sh"
 #   }
 
-#   # connection {
-#   #   type        = "ssh"
-#   #   user        = var.user
-#   #   private_key = file("C:/Users/Luci/.ssh/id_rsa")
-#   #   host        = self.public_ip
-#   # }
+#   connection {
+#     type        = "ssh"
+#     user        = var.user
+#     private_key = tls_private_key.tls_key.private_key_pem
+#     host        = self.public_ip
+#   }
 
 #   provisioner "remote-exec" {
 
