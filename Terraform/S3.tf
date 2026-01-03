@@ -38,23 +38,39 @@ resource "aws_s3_bucket_public_access_block" "s3-terraform_access_block" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_object" "object-upload-html" {
-  for_each     = fileset("../html/", "*.html")
-  bucket       = aws_s3_bucket.s3-terraform.bucket
-  key          = each.value
-  source       = "../html/${each.value}"
-  content_type = "text/html"
-  etag         = filemd5("../html/${each.value}")
+## tfstate bucket ##
+resource "aws_s3_bucket" "s3_tfstate" {
+  bucket = "s3-tfstate-${var.accID}"
+
+  tags = {
+    Name    = "s3-tfstate"
+    Project = "resume"
+  }
 }
 
-resource "aws_s3_object" "object-upload-css" {
-  for_each     = fileset("../html/", "*.css")
-  bucket       = aws_s3_bucket.s3-terraform.bucket
-  key          = each.value
-  source       = "../html/${each.value}"
-  content_type = "text/css"
-  etag         = filemd5("../html/${each.value}")
+resource "aws_s3_bucket_versioning" "s3_tfstate_versioning" {
+  bucket = aws_s3_bucket.s3_tfstate.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3_tfstate_encryption" {
+  bucket = aws_s3_bucket.s3_tfstate.id
 
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
 
+resource "aws_s3_bucket_public_access_block" "s3_tfstate_block_public" {
+  bucket = aws_s3_bucket.s3_tfstate.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
