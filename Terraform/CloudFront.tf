@@ -54,7 +54,7 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
     max_ttl     = 86400
   }
 
-  price_class = "PriceClass_100"
+  price_class  = "PriceClass_100"
   http_version = "http2and3"
 
   restrictions {
