@@ -12,11 +12,20 @@ resource "aws_s3_bucket" "s3-terraform" {
   }
 }
 
-
 resource "aws_s3_bucket_versioning" "s3-terraform_versioning" {
   bucket = aws_s3_bucket.s3-terraform.id
   versioning_configuration {
     status = "Disabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3-terraform_encryption" {
+  bucket = aws_s3_bucket.s3-terraform.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
   }
 }
 
