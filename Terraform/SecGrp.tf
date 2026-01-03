@@ -37,3 +37,5 @@ resource "aws_vpc_security_group_egress_rule" "allowAllOutbound_ipv6" {
   cidr_ipv6         = "::/0"
   ip_protocol       = "-1" # semantically equivalent to all ports
 }
+
+#
