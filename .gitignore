@@ -7,4 +7,5 @@ Terraform/*.hcl
 Terraform/*.info
 Terraform/*.backup
 Terraform/*.tfvars
+*.pem
 *.zip

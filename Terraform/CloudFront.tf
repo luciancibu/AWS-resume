@@ -74,5 +74,3 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
     Project = "resume"
   }
 }
-
-# Test workflow for terraform
