@@ -16,6 +16,18 @@ resource "aws_apigatewayv2_route" "counter_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
+resource "aws_apigatewayv2_route" "messages_put_route" {
+  api_id    = aws_apigatewayv2_api.resume_api.id
+  route_key = "PUT /messages"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "messages_get_route" {
+  api_id    = aws_apigatewayv2_api.resume_api.id
+  route_key = "GET /messages"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
 resource "aws_cloudwatch_log_group" "api_gw_logs" {
   name              = "/aws/apigateway/resume"
   retention_in_days = 14
@@ -37,7 +49,6 @@ resource "aws_apigatewayv2_stage" "default" {
     })
   }
 }
-
 
 resource "aws_lambda_permission" "allow_apigw" {
   statement_id  = "AllowAPIGatewayInvoke"

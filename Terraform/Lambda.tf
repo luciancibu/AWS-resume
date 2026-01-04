@@ -43,7 +43,7 @@ resource "aws_lambda_alias" "prod" {
   }
 }
 
-# Lambda Rollback
+# Lambda Rollback Function
 resource "aws_lambda_function" "rollback_lambda" {
   function_name = "lambda-rollback-handler"
   runtime       = "python3.12"

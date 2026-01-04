@@ -34,3 +34,51 @@ resource "aws_dynamodb_table_item" "resume_views_item" {
     views = { N = "0" }
   })
 }
+
+resource "aws_dynamodb_table_item" "resume_message_item" {
+  table_name = aws_dynamodb_table.basic_dynamodb_table.name
+  hash_key   = "id"
+
+  item = jsonencode({
+    id   = { S = "messages" }
+    text = { S = "text_1" }
+  })
+}
+
+
+# ## message table
+
+# resource "aws_dynamodb_table" "message_dynamodb_table" {
+#   name         = "${var.tableName}-message"
+#   billing_mode = "PAY_PER_REQUEST"
+#   hash_key     = "id"
+
+#   attribute {
+#     name = "id"
+#     type = "S"
+#   }
+
+#   server_side_encryption {
+#     enabled = true
+#   }
+
+#   point_in_time_recovery { # table backup for 35 days
+#     enabled = true
+#   }
+
+#   tags = {
+#     Name        = "dynamodb-terraform-message"
+#     Environment = "resume"
+#   }
+# }
+
+
+# resource "aws_dynamodb_table_item" "message_dynamodb_item" {
+#   table_name = aws_dynamodb_table.message_dynamodb_table.name
+#   hash_key   = "id"
+
+#   item = jsonencode({
+#     id   = { S = "messages" }
+#     text = { S = "text_1" }
+#   })
+# }
