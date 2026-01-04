@@ -195,3 +195,17 @@ body {
         margin-top: 0.15rem;
     }
 }
+
+.btn-primary {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #1f2937;
+  color: #fff;
+  cursor: pointer;
+  margin-left: auto;
+  display: block;
+}
+.btn-primary:hover {
+  background: #111827;
+}

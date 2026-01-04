@@ -26,7 +26,7 @@ def lambda_handler(event, context):
         }
 
     response = table.get_item(Key={"id": ITEM_ID})
-    views = response["Item"]["views"] + 1
+    views = response.get("Item", {}).get("views", 0) + 1
     table.put_item(Item={"id": ITEM_ID, "views": views})
 
     sns.publish(
