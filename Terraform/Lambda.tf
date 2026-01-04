@@ -43,3 +43,27 @@ resource "aws_lambda_alias" "prod" {
   }
 }
 
+# Lambda Rollback
+resource "aws_lambda_function" "rollback_lambda" {
+  function_name = "lambda-rollback-handler"
+  runtime       = "python3.12"
+  handler       = "lambda_rollback.lambda_handler"
+  role          = aws_iam_role.rollback_lambda_role.arn
+
+  filename         = data.archive_file.rollback_lambda_package.output_path
+  source_code_hash = data.archive_file.rollback_lambda_package.output_base64sha256
+
+  environment {
+    variables = {
+      TARGET_FUNCTION_NAME = aws_lambda_function.resume_lambda.function_name
+      ALIAS_NAME           = aws_lambda_alias.prod.name
+      STABLE_VERSION       = var.stable_lambda_version
+    }
+  }
+}
+
+data "archive_file" "rollback_lambda_package" {
+  type        = "zip"
+  source_file = "../Lambda/lambda_rollback.py"
+  output_path = "${path.module}/lambda_rollback.zip"
+}
