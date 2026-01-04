@@ -42,3 +42,19 @@ resource "aws_sns_topic_subscription" "lambda_rollback_email" {
   protocol  = "email"
   endpoint  = "luciancibu@yahoo.com"
 }
+
+
+# Rollback lambda subscriptiuon
+resource "aws_sns_topic_subscription" "rollback_sub" {
+  topic_arn = aws_sns_topic.lambda_rollback.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.rollback_lambda.arn
+}
+
+resource "aws_lambda_permission" "allow_sns_invoke" {
+  statement_id  = "AllowSNSTriggerRollback"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.rollback_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.lambda_rollback.arn
+}

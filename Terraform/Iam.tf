@@ -1,8 +1,6 @@
 # Documentation References:
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role
 
-data "aws_caller_identity" "current" {}
-
 resource "aws_iam_role" "lambda_role_terraform" {
   name = "lambda-role-terraform"
 
@@ -34,7 +32,7 @@ resource "aws_iam_role_policy" "lambda_policy_terraform" {
           "dynamodb:PutItem",
           "dynamodb:UpdateItem"
         ],
-        Resource = "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.tableName}"
+        Resource = "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.basic_dynamodb_table.name}"
       },
       {
         Effect = "Allow",
@@ -44,13 +42,13 @@ resource "aws_iam_role_policy" "lambda_policy_terraform" {
           "logs:PutLogEvents",
           "logs:DescribeLogStreams"
         ],
-        Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.resume_lambda.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.resume_lambda.function_name}:*"
       },
 
       {
         Effect   = "Allow",
         Action   = "sns:Publish",
-        Resource = "arn:aws:sns:${var.region}:${data.aws_caller_identity.current.account_id}:${aws_sns_topic.resume_sns_topic.name}"
+        Resource = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_sns_topic.resume_sns_topic.name}"
       }
     ]
   })
@@ -83,4 +81,49 @@ data "aws_iam_policy_document" "s3_allow_cloudfront_oac" {
 resource "aws_s3_bucket_policy" "resume_policy" {
   bucket = aws_s3_bucket.s3-terraform.id
   policy = data.aws_iam_policy_document.s3_allow_cloudfront_oac.json
+}
+
+
+# Rollback lamba role
+resource "aws_iam_role" "rollback_lambda_role" {
+  name = "rollback-lambda-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "lambda.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "rollback_lambda_policy" {
+  role = aws_iam_role.rollback_lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:GetAlias",
+          "lambda:UpdateAlias"
+        ]
+        Resource = [
+          "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${aws_lambda_function.resume_lambda.function_name}",
+          "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${aws_lambda_function.resume_lambda.function_name}:${aws_lambda_alias.prod.name}"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
