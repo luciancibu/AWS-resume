@@ -85,3 +85,48 @@ resource "aws_s3_bucket_public_access_block" "s3_tfstate_block_public" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+
+## Codeguru bucket ##
+
+# Reason: personal project, logging not needed
+# tfsec:ignore:aws-s3-enable-bucket-logging
+resource "aws_s3_bucket" "s3_codeguru" {
+  bucket = "codeguru-reviewer-${var.accID}"
+
+  tags = {
+    Name    = "codeguru-reviewer"
+    Project = "resume"
+  }
+}
+
+# Reason: personal project, versioning not needed
+# tfsec:ignore:aws-s3-enable-versioning
+resource "aws_s3_bucket_versioning" "s3_codeguru_versioning" {
+  bucket = aws_s3_bucket.s3_codeguru.id
+
+  versioning_configuration {
+    status = "Disabled"
+  }
+}
+
+# Reason: personal project, AWS-managed key is sufficient
+# tfsec:ignore:aws-s3-encryption-customer-key
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3_tfstate_encryption" {
+  bucket = aws_s3_bucket.s3_tfstate.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "s3_tfstate_block_public" {
+  bucket = aws_s3_bucket.s3_tfstate.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
