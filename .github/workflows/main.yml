@@ -150,6 +150,9 @@ jobs:
       - name: Terraform validate
         run: terraform validate        
 
+      - name: Terraform security scan
+        uses: aquasecurity/tfsec-action@v1.0.3
+
       - name: Terraform plan
         id: plan
         run: terraform plan -input=false -out planfile
