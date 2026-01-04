@@ -20,4 +20,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_prod_errors" {
   # breaching    -> treat missing data as "ALARM" (alarm triggers if no data is available)
   # ignore       -> ignore missing data when evaluating the alarm
   # missing      -> keep alarm state as INSUFFICIENT_DATA when data is missing
+
+  alarm_actions = [
+    aws_sns_topic.lambda_rollback.arn
+  ]
 }

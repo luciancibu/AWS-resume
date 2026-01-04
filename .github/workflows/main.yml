@@ -107,20 +107,10 @@ jobs:
           cat pylint-report.txt          
         working-directory: Lambda
 
-      - name: Zip Lambda
-        run: |
-          cd Lambda
-          zip -r ../Lambda.zip .
-
-      - name: Deploy Lambda
-        run: |
-          aws lambda update-function-code \
-            --function-name ${{ env.LAMBDA_FUNCTION }} \
-            --zip-file fileb://Lambda.zip
-
   deploy_terraform:
-    needs: detect_changes
-    if: needs.detect_changes.outputs.terraform == 'true'
+    needs:
+      - detect_changes
+    if: needs.detect_changes.outputs.terraform == 'true' || needs.detect_changes.outputs.lambda == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:

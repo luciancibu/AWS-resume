@@ -26,3 +26,8 @@ variable "tableName" {
 variable "accID" {
   default = "083971419667"
 }
+
+variable "stable_lambda_version" {
+  type    = string
+  default = "1"
+}

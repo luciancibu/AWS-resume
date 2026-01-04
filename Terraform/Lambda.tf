@@ -35,5 +35,11 @@ resource "aws_lambda_alias" "prod" {
   name             = "prod"
   function_name    = aws_lambda_function.resume_lambda.function_name
   function_version = aws_lambda_function.resume_lambda.version
+
+  routing_config {
+    additional_version_weights = {
+      (var.stable_lambda_version) = 0.9
+    }
+  }
 }
 
