@@ -20,6 +20,7 @@ resource "aws_lambda_function" "resume_lambda" {
   source_code_hash = data.archive_file.python_lambda_package.output_base64sha256
 
   timeout = 5
+  publish = true // versioning
 
   environment {
     variables = {
@@ -29,3 +30,10 @@ resource "aws_lambda_function" "resume_lambda" {
     }
   }
 }
+
+resource "aws_lambda_alias" "prod" {
+  name             = "prod"
+  function_name    = aws_lambda_function.resume_lambda.function_name
+  function_version = aws_lambda_function.resume_lambda.version
+}
+

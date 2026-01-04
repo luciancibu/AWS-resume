@@ -6,7 +6,7 @@ resource "aws_apigatewayv2_api" "resume_api" {
 resource "aws_apigatewayv2_integration" "lambda_integration" {
   api_id                 = aws_apigatewayv2_api.resume_api.id
   integration_type       = "AWS_PROXY"
-  integration_uri        = aws_lambda_function.resume_lambda.invoke_arn
+  integration_uri        = aws_lambda_alias.prod.invoke_arn
   payload_format_version = "2.0"
 }
 
@@ -43,7 +43,7 @@ resource "aws_lambda_permission" "allow_apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.resume_lambda.function_name
+  qualifier     = aws_lambda_alias.prod.name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.resume_api.execution_arn}/*/*"
 }
-
