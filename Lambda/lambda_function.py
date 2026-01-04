@@ -1,12 +1,14 @@
+import os
 import boto3
 
+TABLE_NAME = os.environ["DYNAMODB_TABLE"]
+ITEM_ID = os.environ.get("ITEM_ID", "views")
+SNS_TOPIC_ARN = os.environ["SNS_TOPIC_ARN"]
+
 dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table("dynamodb-terraform")
+table = dynamodb.Table(TABLE_NAME)
 
 sns = boto3.client("sns")
-SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:083971419667:SNS-resume"
-
-ITEM_ID = "views"
 
 
 def lambda_handler(event, context):

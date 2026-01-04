@@ -20,4 +20,12 @@ resource "aws_lambda_function" "resume_lambda" {
   source_code_hash = data.archive_file.python_lambda_package.output_base64sha256
 
   timeout = 5
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.basic_dynamodb_table.name
+      SNS_TOPIC_ARN  = aws_sns_topic.resume_sns_topic.arn
+      ITEM_ID        = "views"
+    }
+  }
 }
