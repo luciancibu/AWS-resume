@@ -8,10 +8,20 @@
 #   key_name               = aws_key_pair.Jenkins_terraform-key.key_name
 #   vpc_security_group_ids = [aws_security_group.Jenkins_terraform-sg.id]
 #   availability_zone      = var.zone
+
+#   root_block_device {
+#     encrypted = true
+#   }
+
+#   metadata_options {
+#     http_tokens = "required"
+#   }
+
 #   tags = {
 #     Name    = "Jenkins_terraform"
 #     Project = "resume"
 #   }
+
 
 #   provisioner "file" {
 #     source      = "setup_Jenkins.sh"

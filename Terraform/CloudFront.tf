@@ -16,6 +16,9 @@ data "aws_acm_certificate" "lucian-cibu-xyz" {
   most_recent = true
 }
 
+# Reason: personal project, WAF and logging not needed
+# tfsec:ignore:aws-cloudfront-enable-waf
+# tfsec:ignore:aws-cloudfront-enable-logging
 resource "aws_cloudfront_distribution" "resume_distribution" {
   enabled         = true
   is_ipv6_enabled = true

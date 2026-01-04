@@ -3,6 +3,8 @@
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_website_configuration
 # https://medium.com/@frankpromiseedah/hosting-a-static-website-on-aws-s3-using-terraform-e12addd22d18
 
+# Reason: personal project, logging not needed
+# tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "s3-terraform" {
   bucket = "s3-terraform-${var.accID}"
 
@@ -12,13 +14,17 @@ resource "aws_s3_bucket" "s3-terraform" {
   }
 }
 
+# Reason: personal project, versioning not needed
+# tfsec:ignore:aws-s3-enable-versioning
 resource "aws_s3_bucket_versioning" "s3-terraform_versioning" {
   bucket = aws_s3_bucket.s3-terraform.id
   versioning_configuration {
     status = "Disabled"
   }
-}
 
+}
+# Reason: personal project, AWS-managed key is sufficient
+# tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3-terraform_encryption" {
   bucket = aws_s3_bucket.s3-terraform.id
 
@@ -39,6 +45,9 @@ resource "aws_s3_bucket_public_access_block" "s3-terraform_access_block" {
 }
 
 ## tfstate bucket ##
+
+# Reason: personal project, logging not needed
+# tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "s3_tfstate" {
   bucket = "s3-tfstate-${var.accID}"
 
@@ -56,6 +65,8 @@ resource "aws_s3_bucket_versioning" "s3_tfstate_versioning" {
   }
 }
 
+# Reason: personal project, AWS-managed key is sufficient
+# tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3_tfstate_encryption" {
   bucket = aws_s3_bucket.s3_tfstate.id
 

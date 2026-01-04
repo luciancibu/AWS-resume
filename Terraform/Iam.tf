@@ -56,8 +56,11 @@ resource "aws_iam_role_policy" "lambda_policy_terraform" {
   })
 }
 
+# Reason: personal project, AWS-managed key is sufficient
+# tfsec:ignore:aws-sns-topic-encryption-use-cmk
 resource "aws_sns_topic" "resume_sns_topic" {
-  name = "SNS-resume"
+  name              = "SNS-resume"
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_sns_topic_subscription" "resume_email_sub" {

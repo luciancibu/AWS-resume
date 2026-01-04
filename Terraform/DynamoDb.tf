@@ -11,6 +11,14 @@ resource "aws_dynamodb_table" "basic_dynamodb_table" {
     type = "S"
   }
 
+  server_side_encryption {
+    enabled = true
+  }
+
+  point_in_time_recovery { # table backup for 35 fays
+    enabled = true
+  }
+
   tags = {
     Name        = "dynamodb-terraform"
     Environment = "resume"

@@ -16,11 +16,28 @@ resource "aws_apigatewayv2_route" "counter_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
+resource "aws_cloudwatch_log_group" "api_gw_logs" {
+  name              = "/aws/apigateway/resume"
+  retention_in_days = 14
+}
+
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.resume_api.id
   name        = "$default"
   auto_deploy = true
+
+  # CloudWatch logs
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_gw_logs.arn
+    format = jsonencode({
+      requestId = "$context.requestId"
+      status    = "$context.status"
+      ip        = "$context.identity.sourceIp"
+      routeKey  = "$context.routeKey"
+    })
+  }
 }
+
 
 resource "aws_lambda_permission" "allow_apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
@@ -29,3 +46,4 @@ resource "aws_lambda_permission" "allow_apigw" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.resume_api.execution_arn}/*/*"
 }
+
