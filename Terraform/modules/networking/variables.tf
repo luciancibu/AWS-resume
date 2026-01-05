@@ -28,6 +28,11 @@ variable "likes_lambda_invoke_arn" {
   type        = string
 }
 
+variable "pdf_lambda_invoke_arn" {
+  description = "Invoke ARN of the likes Lambda function"
+  type        = string
+}
+
 variable "resume_lambda_function_name" {
   description = "Name of the resume Lambda function"
   type        = string
@@ -35,6 +40,11 @@ variable "resume_lambda_function_name" {
 
 variable "likes_lambda_function_name" {
   description = "Name of the likes Lambda function"
+  type        = string
+}
+
+variable "pdf_lambda_function_name" {
+  description = "Name of the PDF Lambda function"
   type        = string
 }
 

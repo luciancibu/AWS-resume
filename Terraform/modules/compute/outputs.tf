@@ -42,3 +42,18 @@ output "rollback_lambda_arn" {
   description = "ARN of the rollback Lambda function"
   value       = aws_lambda_function.rollback_lambda.arn
 }
+
+output "pdf_lambda_function_name" {
+  description = "Name of the PDF Lambda function"
+  value       = aws_lambda_function.resume_lambda_pdf.function_name
+}
+
+output "pdf_lambda_arn" {
+  description = "ARN of the PDF Lambda function"
+  value       = aws_lambda_function.resume_lambda_pdf.arn
+}
+
+output "pdf_lambda_invoke_arn" {
+  description = "Invoke ARN of the PDF Lambda function"
+  value       = aws_lambda_function.resume_lambda_pdf.invoke_arn
+}

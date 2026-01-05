@@ -135,6 +135,13 @@ resource "aws_apigatewayv2_integration" "lambda_integration_likes" {
   payload_format_version = "2.0"
 }
 
+resource "aws_apigatewayv2_integration" "lambda_integration_pdf" {
+  api_id                 = aws_apigatewayv2_api.resume_api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = var.pdf_lambda_invoke_arn
+  payload_format_version = "2.0"
+}
+
 # API Routes
 resource "aws_apigatewayv2_route" "counter_route" {
   api_id    = aws_apigatewayv2_api.resume_api.id
@@ -154,6 +161,12 @@ resource "aws_apigatewayv2_route" "likes_get_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration_likes.id}"
 }
 
+resource "aws_apigatewayv2_route" "pdf_get_route" {
+  api_id    = aws_apigatewayv2_api.resume_api.id
+  route_key = "GET /pdf"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration_pdf.id}"
+}
+
 # Lambda permissions
 resource "aws_lambda_permission" "allow_apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
@@ -168,6 +181,14 @@ resource "aws_lambda_permission" "allow_apigw_likes" {
   statement_id  = "AllowAPIGatewayInvokelikes"
   action        = "lambda:InvokeFunction"
   function_name = var.likes_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.resume_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "allow_apigw_pdf" {
+  statement_id  = "AllowAPIGatewayInvokelikes"
+  action        = "lambda:InvokeFunction"
+  function_name = var.pdf_lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.resume_api.execution_arn}/*/*"
 }

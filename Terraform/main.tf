@@ -81,6 +81,10 @@ module "networking" {
   likes_lambda_invoke_arn     = module.compute.likes_lambda_invoke_arn
   resume_lambda_function_name = module.compute.resume_lambda_function_name
   likes_lambda_function_name  = module.compute.likes_lambda_function_name
+  pdf_lambda_function_name    = module.compute.pdf_lambda_function_name
+  pdf_lambda_invoke_arn       = module.compute.pdf_lambda_invoke_arn
+
+
 }
 
 # Infrastructure Module - Optional EC2 Jenkins server
