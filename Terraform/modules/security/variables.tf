@@ -17,3 +17,8 @@ variable "sns_topic_arn" {
   description = "ARN of the SNS topic"
   type        = string
 }
+
+variable "pdf_bucket_name" {
+  description = "Name of the S3 bucket for PDF files"
+  type        = string
+}

@@ -22,3 +22,8 @@ output "dynamodb_table_arn" {
   description = "ARN of the DynamoDB table"
   value       = aws_dynamodb_table.resume_table.arn
 }
+
+output "pdf_bucket_name" {
+  description = "Name of the S3 bucket for PDF files"
+  value       = aws_s3_bucket.pdf_bucket.bucket 
+}

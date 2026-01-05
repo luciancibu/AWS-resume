@@ -42,3 +42,8 @@ variable "pdf_lambda_source_path" {
   description = "Path to the PDF Lambda function source"
   type        = string
 }
+
+variable "pdf_lambda_role_arn" {
+  description = "ARN of the PDF Lambda execution role"
+  type        = string
+}

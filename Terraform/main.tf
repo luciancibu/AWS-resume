@@ -51,6 +51,7 @@ module "security" {
   account_id         = var.account_id
   dynamodb_table_arn = module.storage.dynamodb_table_arn
   sns_topic_arn      = module.monitoring.resume_sns_topic_arn
+  pdf_bucket_name    = module.storage.pdf_bucket_name
 }
 
 # Compute Module - Lambda functions with versioning
@@ -58,6 +59,7 @@ module "compute" {
   source = "./modules/compute"
 
   lambda_role_arn             = module.security.lambda_role_arn
+  pdf_lambda_role_arn         = module.security.pdf_lambda_role_arn
   rollback_lambda_role_arn    = module.security.rollback_lambda_role_arn
   dynamodb_table_name         = module.storage.dynamodb_table_name
   sns_topic_arn               = module.monitoring.resume_sns_topic_arn
