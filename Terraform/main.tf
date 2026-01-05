@@ -49,6 +49,7 @@ module "security" {
 
   region             = var.region
   account_id         = var.account_id
+  pdf_file_name      = var.pdf_file_name
   dynamodb_table_arn = module.storage.dynamodb_table_arn
   sns_topic_arn      = module.monitoring.resume_sns_topic_arn
   pdf_bucket_name    = module.storage.pdf_bucket_name
@@ -64,6 +65,8 @@ module "compute" {
   dynamodb_table_name         = module.storage.dynamodb_table_name
   sns_topic_arn               = module.monitoring.resume_sns_topic_arn
   stable_lambda_version       = var.stable_lambda_version
+  pdf_file_name               = var.pdf_file_name
+  pdf_bucket_name             = module.storage.pdf_bucket_name
   lambda_source_path          = "../Lambda/lambda_function.py"
   likes_lambda_source_path    = "../Lambda/lambda_likes.py"
   rollback_lambda_source_path = "../Lambda/lambda_rollback.py"
@@ -74,19 +77,17 @@ module "compute" {
 module "networking" {
   source = "./modules/networking"
 
-  root_domain_name            = var.root_domain_name
-  s3_bucket_domain_name       = module.storage.website_bucket_domain_name
-  s3_bucket_id                = module.storage.website_bucket_id
-  s3_bucket_arn               = module.storage.website_bucket_arn
-  resume_lambda_alias_name    = module.compute.resume_lambda_alias_name
-  resume_lambda_invoke_arn    = module.compute.resume_lambda_invoke_arn_alias
-  likes_lambda_invoke_arn     = module.compute.likes_lambda_invoke_arn
-  resume_lambda_function_name = module.compute.resume_lambda_function_name
-  likes_lambda_function_name  = module.compute.likes_lambda_function_name
-  pdf_lambda_function_name    = module.compute.pdf_lambda_function_name
-  pdf_lambda_invoke_arn       = module.compute.pdf_lambda_invoke_arn
-
-
+  root_domain_name               = var.root_domain_name
+  s3_bucket_domain_name          = module.storage.website_bucket_domain_name
+  s3_bucket_id                   = module.storage.website_bucket_id
+  s3_bucket_arn                  = module.storage.website_bucket_arn
+  resume_lambda_alias_name       = module.compute.resume_lambda_alias_name
+  resume_lambda_invoke_arn_alias = module.compute.resume_lambda_invoke_arn_alias
+  likes_lambda_invoke_arn        = module.compute.likes_lambda_invoke_arn
+  resume_lambda_function_name    = module.compute.resume_lambda_function_name
+  likes_lambda_function_name     = module.compute.likes_lambda_function_name
+  pdf_lambda_function_name       = module.compute.pdf_lambda_function_name
+  pdf_lambda_invoke_arn          = module.compute.pdf_lambda_invoke_arn
 }
 
 # Infrastructure Module - Optional EC2 Jenkins server

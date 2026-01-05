@@ -60,3 +60,9 @@ variable "allowed_ssh_cidr" {
   type        = string
   default     = "188.24.56.231/32"
 }
+
+variable "pdf_file_name" {
+  description = "Name of the PDF file in the S3 bucket"
+  type        = string
+  default     = "lucian_cibu_resume.pdf"
+}

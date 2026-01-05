@@ -42,13 +42,6 @@ AWS-resume/
 │           ├── monitoring/          # CloudWatch + SNS
 │           └── infrastructure/      # EC2 Jenkins (optional)
 │
-├── _tests/
-│     ├── tests.py
-│     ├── db_tests.py
-│     └── Jenkins/
-│     └── Lambda/
-│     └── SNS/
-│     └── Terraform/
 │
 ├── .github/workflows/main.yml
 ├── Jenkinsfile
@@ -84,6 +77,7 @@ Lambda is granted read/write privileges on DynamoDB.
 ### 5. Lambda Functions (Python)  
 - **Main Lambda**: Increments and returns the website view counter with visitor analytics
 - **Likes Lambda**: Handles GET requests to retrieve current like count and PUT requests to increment likes for the resume
+- **Download Lambda**: Serves resume PDF files from S3 with download tracking and analytics
 - **Rollback Lambda**: Automated rollback mechanism triggered by CloudWatch alarms
 Lambda functions are invoked through API Gateway (HTTP API) and are not publicly exposed.
 
@@ -126,10 +120,11 @@ User → CloudFront → S3 (Static Site)
 
 **Normal Flow:**
 1. User visits website → CloudFront serves static content from S3
-2. JavaScript calls API Gateway endpoints (`/view` and `/likes`)
+2. JavaScript calls API Gateway endpoints (`/view`, `/likes`, `/pdf`)
 3. Lambda functions process requests and update DynamoDB counters
 4. Main Lambda sends SNS notification for each view with visitor analytics
 5. Likes Lambda handles like button interactions (GET/PUT requests)
+6. Download Lambda retrieves resume PDF from S3 and tracks download metrics
 
 **Error Handling Flow:**
 1. CloudWatch monitors Lambda function errors
@@ -152,6 +147,7 @@ Jenkins (EC2) ──────────────────────
 Deployed website is accessible at:
 
 **https://resume.lucian-cibu.xyz**
+
 
 ## Summary
 

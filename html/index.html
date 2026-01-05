@@ -6,6 +6,7 @@
     <title>Lucian Cibu - Resume</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    
   </head>
 
   <body>
@@ -360,12 +361,18 @@
       <div class="views">
         <p id="view-counter">Loading views...</p>
       </div>
-      
+
       <div class="Likes">
-      <button id="action-btn" class="btn-primary">Like button</button>
-      <p id="likes">Loading likes...</p>
+        <button id="action-btn" class="btn-primary">Like <i class="fa fa-thumbs-up"></i></button>
+
+        
+        <p id="likes">Loading likes...</p>
       </div>
 
+      <div class="PDF">
+        <button class="btn-primary" onclick="downloadPdf()">Download Resume</button>
+
+      </div>
     </div>
 
     <script>
@@ -394,37 +401,42 @@
       updateCounter();
     </script>
 
-  <script>
-  async function updateLike() {
-    const API_URL = "https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com/likes";
-    const btn = document.getElementById("action-btn");
-    const likesText = document.getElementById("likes");
+    <script>
+      async function updateLike() {
+        const API_URL =
+          "https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com/likes";
+        const btn = document.getElementById("action-btn");
+        const likesText = document.getElementById("likes");
 
-    const response = await fetch(API_URL);
-    const likesNumber = await response.text();
-    likesText.textContent = `Likes: ${likesNumber}`;
-
-    btn.addEventListener("click", async () => {
-      try {
-        // increment
-        await fetch(API_URL, { method: "PUT" });
-
-        // read updated value
         const response = await fetch(API_URL);
         const likesNumber = await response.text();
-
         likesText.textContent = `Likes: ${likesNumber}`;
-      } catch (err) {
-        console.error(err);
-        likesText.textContent = "Error updating likes";
+
+        btn.addEventListener("click", async () => {
+          try {
+            // increment
+            await fetch(API_URL, { method: "PUT" });
+
+            // read updated value
+            const response = await fetch(API_URL);
+            const likesNumber = await response.text();
+
+            likesText.textContent = `Likes: ${likesNumber}`;
+          } catch (err) {
+            console.error(err);
+            likesText.textContent = "Error updating likes";
+          }
+        });
       }
-    });
-  }
 
-  updateLike();
-  </script>
+      updateLike();
+    </script>
 
-
-   
+    <script>
+      function downloadPdf() {
+        window.location.href =
+          "https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com/pdf";
+      }
+    </script>
   </body>
 </html>

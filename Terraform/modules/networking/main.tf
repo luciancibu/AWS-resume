@@ -113,7 +113,7 @@ resource "aws_apigatewayv2_api" "resume_api" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = ["*"]
+    allow_origins = ["https://resume.lucian-cibu.xyz"]
     allow_methods = ["GET", "PUT", "OPTIONS"]
     allow_headers = ["content-type"]
     max_age       = 300
@@ -124,7 +124,7 @@ resource "aws_apigatewayv2_api" "resume_api" {
 resource "aws_apigatewayv2_integration" "lambda_integration" {
   api_id                 = aws_apigatewayv2_api.resume_api.id
   integration_type       = "AWS_PROXY"
-  integration_uri        = var.resume_lambda_invoke_arn
+  integration_uri        = var. resume_lambda_invoke_arn_alias
   payload_format_version = "2.0"
 }
 

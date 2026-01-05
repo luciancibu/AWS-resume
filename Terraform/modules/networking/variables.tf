@@ -18,7 +18,7 @@ variable "s3_bucket_arn" {
   type        = string
 }
 
-variable "resume_lambda_invoke_arn" {
+variable "resume_lambda_invoke_arn_alias" {
   description = "Invoke ARN of the resume Lambda function"
   type        = string
 }
@@ -29,7 +29,7 @@ variable "likes_lambda_invoke_arn" {
 }
 
 variable "pdf_lambda_invoke_arn" {
-  description = "Invoke ARN of the likes Lambda function"
+  description = "Invoke ARN of the PDF Lambda function"
   type        = string
 }
 

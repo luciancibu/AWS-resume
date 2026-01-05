@@ -123,7 +123,7 @@ resource "aws_iam_role_policy" "pdf_lambda_policy" {
           "s3:GetObject",
         ]
         Resource = [
-          "arn:aws:s3:::${var.pdf_bucket_name}/Resume.pdf"
+          "arn:aws:s3:::${var.pdf_bucket_name}/${var.pdf_file_name}"
         ]
       },
       {

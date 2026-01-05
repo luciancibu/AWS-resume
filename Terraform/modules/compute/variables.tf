@@ -47,3 +47,15 @@ variable "pdf_lambda_role_arn" {
   description = "ARN of the PDF Lambda execution role"
   type        = string
 }
+
+variable "pdf_file_name" {
+  description = "Name of the PDF file in S3"
+  type        = string
+}
+
+variable "pdf_bucket_name" {
+  description = "Name of the PDF S3 bucket"
+  type        = string
+}
+
+

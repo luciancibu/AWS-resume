@@ -22,3 +22,8 @@ variable "pdf_bucket_name" {
   description = "Name of the S3 bucket for PDF files"
   type        = string
 }
+
+variable "pdf_file_name" {
+  description = "Name of the PDF file in the S3 bucket"
+  type        = string
+}

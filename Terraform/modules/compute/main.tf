@@ -114,10 +114,10 @@ resource "aws_lambda_function" "resume_lambda_pdf" {
   timeout = 5
   publish = false
 
-  # environment {
-  #   variables = {
-  #     DYNAMODB_TABLE = var.dynamodb_table_name
-  #     ITEM_ID        = "likes"
-  #   }
-  # }
+  environment {
+    variables = {
+      BUCKET_NAME = var.pdf_bucket_name
+      ITEM_NAME   = var.pdf_file_name
+    }
+  }
 }
