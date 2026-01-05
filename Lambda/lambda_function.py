@@ -12,6 +12,7 @@ sns = boto3.client("sns")
 
 
 def lambda_handler(event, context):
+    # raise Exception("FORCED ERROR FOR TESTING")
 
     params = event.get("queryStringParameters") or {}
     response = table.get_item(Key={"id": ITEM_ID})

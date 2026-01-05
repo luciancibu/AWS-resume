@@ -64,8 +64,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_prod_errors" {
   metric_name = "Errors"
   statistic   = "Sum"
 
-  period              = 20
-  evaluation_periods  = 1
+  period              = 300
+  evaluation_periods  = 2
   threshold           = 1
   comparison_operator = "GreaterThanOrEqualToThreshold"
 
