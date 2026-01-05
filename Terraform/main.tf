@@ -65,6 +65,7 @@ module "compute" {
   lambda_source_path          = "../Lambda/lambda_function.py"
   likes_lambda_source_path    = "../Lambda/lambda_likes.py"
   rollback_lambda_source_path = "../Lambda/lambda_rollback.py"
+  pdf_lambda_source_path      = "../Lambda/lambda_pdf.py"
 }
 
 # Networking Module - CloudFront, API Gateway, and S3 policies

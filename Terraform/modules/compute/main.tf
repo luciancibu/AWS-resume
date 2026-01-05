@@ -93,3 +93,31 @@ resource "aws_lambda_function" "rollback_lambda" {
     }
   }
 }
+
+# Lambda PDF
+data "archive_file" "pdf_lambda_package" {
+  type        = "zip"
+  source_file = var.pdf_lambda_source_path
+  output_path = "${path.module}/lambda_pdf.zip"
+}
+
+resource "aws_lambda_function" "resume_lambda_pdf" {
+  function_name = "lambda-terraform-pdf" 
+  handler = "lambda_pdf.lambda_handler"
+  runtime = "python3.12"
+
+  role = var.lambda_role_arn
+
+  filename         = data.archive_file.pdf_lambda_package.output_path
+  source_code_hash = data.archive_file.pdf_lambda_package.output_base64sha256
+
+  timeout = 5
+  publish = false
+
+  # environment {
+  #   variables = {
+  #     DYNAMODB_TABLE = var.dynamodb_table_name
+  #     ITEM_ID        = "likes"
+  #   }
+  # }
+}

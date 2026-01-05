@@ -37,3 +37,8 @@ variable "rollback_lambda_source_path" {
   description = "Path to the rollback Lambda function source"
   type        = string
 }
+
+variable "pdf_lambda_source_path" {
+  description = "Path to the PDF Lambda function source"
+  type        = string
+}
