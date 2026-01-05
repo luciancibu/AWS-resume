@@ -75,7 +75,8 @@ module "networking" {
   s3_bucket_domain_name       = module.storage.website_bucket_domain_name
   s3_bucket_id                = module.storage.website_bucket_id
   s3_bucket_arn               = module.storage.website_bucket_arn
-  resume_lambda_invoke_arn    = module.compute.resume_lambda_invoke_arn
+  resume_lambda_alias_name    = module.compute.resume_lambda_alias_name
+  resume_lambda_invoke_arn    = module.compute.resume_lambda_invoke_arn_alias
   likes_lambda_invoke_arn     = module.compute.likes_lambda_invoke_arn
   resume_lambda_function_name = module.compute.resume_lambda_function_name
   likes_lambda_function_name  = module.compute.likes_lambda_function_name

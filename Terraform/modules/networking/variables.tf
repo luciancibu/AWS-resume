@@ -37,3 +37,8 @@ variable "likes_lambda_function_name" {
   description = "Name of the likes Lambda function"
   type        = string
 }
+
+variable "resume_lambda_alias_name" {
+  description = "Name of the Lambda alias"
+  type        = string
+}

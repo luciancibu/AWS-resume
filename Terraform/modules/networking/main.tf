@@ -159,7 +159,7 @@ resource "aws_lambda_permission" "allow_apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = var.resume_lambda_function_name
-  qualifier     = "prod"
+  qualifier     = var.resume_lambda_alias_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.resume_api.execution_arn}/*/*"
 }

@@ -13,6 +13,16 @@ output "resume_lambda_invoke_arn" {
   value       = aws_lambda_function.resume_lambda.invoke_arn
 }
 
+output "resume_lambda_invoke_arn_alias" {
+  description = "Invoke ARN of the ALIAS main resume Lambda function"
+  value       = aws_lambda_alias.prod.invoke_arn
+}
+
+output "resume_lambda_alias_name" {
+  description = "Name of the Lambda alias"
+  value       = aws_lambda_alias.prod.name
+}
+
 output "likes_lambda_function_name" {
   description = "Name of the likes Lambda function"
   value       = aws_lambda_function.resume_lambda_likes.function_name
