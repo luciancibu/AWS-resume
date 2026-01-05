@@ -1,11 +1,46 @@
-_tests/
-Terraform/.terraform/
-Terraform/terraform.tfstate
-Terraform/*.txt
-Terraform/*.exe
-Terraform/*.hcl
-Terraform/*.info
-Terraform/*.backup
-Terraform/*.tfvars
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/*.tfplan
+**/*.tfvars
+**/*.zip
+
+# AWS/SSH Keys
 *.pem
-*.zip
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.txt
+
+# Test outputs
+_tests/
+
+# Node modules (if any)
+node_modules/

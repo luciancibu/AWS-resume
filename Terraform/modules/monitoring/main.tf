@@ -1,4 +1,4 @@
-# Reason: personal project, AWS-managed key is sufficient
+# SNS Topics
 # tfsec:ignore:aws-sns-topic-encryption-use-cmk
 resource "aws_sns_topic" "resume_sns_topic" {
   name              = "SNS-resume"
@@ -8,11 +8,9 @@ resource "aws_sns_topic" "resume_sns_topic" {
 resource "aws_sns_topic_subscription" "resume_email_sub" {
   topic_arn = aws_sns_topic.resume_sns_topic.arn
   protocol  = "email"
-  endpoint  = "luciancibu@yahoo.com"
+  endpoint  = var.notification_email
 }
 
-
-# Reason: personal project, AWS-managed key is sufficient
 # tfsec:ignore:aws-sns-enable-topic-encryption
 resource "aws_sns_topic" "lambda_rollback" {
   name = "lambda-rollback-topic"
@@ -37,24 +35,48 @@ resource "aws_sns_topic_policy" "lambda_rollback_policy" {
   })
 }
 
+# tfsec:ignore:aws-sns-enable-topic-encryption
 resource "aws_sns_topic_subscription" "lambda_rollback_email" {
   topic_arn = aws_sns_topic.lambda_rollback.arn
   protocol  = "email"
-  endpoint  = "luciancibu@yahoo.com"
+  endpoint  = var.notification_email
 }
 
-
-# Rollback lambda subscriptiuon
 resource "aws_sns_topic_subscription" "rollback_sub" {
   topic_arn = aws_sns_topic.lambda_rollback.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.rollback_lambda.arn
+  endpoint  = var.rollback_lambda_arn
 }
 
 resource "aws_lambda_permission" "allow_sns_invoke" {
   statement_id  = "AllowSNSTriggerRollback"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rollback_lambda.function_name
+  function_name = var.rollback_lambda_function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.lambda_rollback.arn
+}
+
+# CloudWatch Alarm
+resource "aws_cloudwatch_metric_alarm" "lambda_prod_errors" {
+  alarm_name = "lambda-prod-errors"
+
+  namespace   = "AWS/Lambda"
+  metric_name = "Errors"
+  statistic   = "Sum"
+
+  period              = 300
+  evaluation_periods  = 2
+  threshold           = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+
+  dimensions = {
+    FunctionName = var.lambda_function_name
+    Resource     = "${var.lambda_function_name}:prod"
+  }
+
+  treat_missing_data = "notBreaching"
+
+  alarm_actions = [
+    aws_sns_topic.lambda_rollback.arn
+  ]
 }

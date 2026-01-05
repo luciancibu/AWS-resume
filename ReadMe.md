@@ -24,24 +24,23 @@ AWS-resume/
 ├── Lambda/
 │     ├── lambda_function.py
 │     ├── lambda_likes.py
-│     ├── lambda_rollback.py
+│     └── lambda_rollback.py
 │
 ├── Terraform/
-│     ├── S3.tf
-│     ├── CloudFront.tf
-│     ├── DynamoDb.tf
-│     ├── Iam.tf
-│     ├── Lambda.tf
-│     ├── Instance.tf
-│     ├── SecGrp.tf
-│     ├── Api.tf
-│     ├── CloudWatch.tf
-│     ├── Sns.tf
-│     ├── Keypair.tf
-│     ├── vars.tf
-│     ├── provider.tf
-│     ├── backend.tf
-│     └── setup_Jenkins.sh
+│     ├── main.tf                    # Main configuration
+│     ├── variables.tf               # Root variables
+│     ├── outputs.tf                 # Root outputs
+│     ├── provider.tf                # Provider config
+│     ├── backend.tf                 # Remote state
+│     ├── setup_Jenkins.sh           # Jenkins setup script
+│     ├── README_MODULES.md          # Module documentation
+│     └── modules/
+│           ├── storage/             # S3 + DynamoDB
+│           ├── compute/             # Lambda functions
+│           ├── networking/          # CloudFront + API Gateway
+│           ├── security/            # IAM roles/policies
+│           ├── monitoring/          # CloudWatch + SNS
+│           └── infrastructure/      # EC2 Jenkins (optional)
 │
 ├── _tests/
 │     ├── tests.py
@@ -56,7 +55,17 @@ AWS-resume/
 └── README.md
 ```
 
-## Infrastructure Overview (Terraform)
+## Infrastructure Overview (Terraform Modules)
+
+The infrastructure is now organized into reusable Terraform modules for better maintainability and scalability:
+
+### Module Architecture
+- **Storage Module**: S3 buckets (website + tfstate) and DynamoDB table
+- **Compute Module**: Lambda functions (main, likes, rollback) with versioning
+- **Networking Module**: CloudFront distribution, API Gateway, and S3 policies
+- **Security Module**: IAM roles and policies for Lambda functions
+- **Monitoring Module**: CloudWatch alarms and SNS topics for notifications
+- **Infrastructure Module**: Optional EC2 Jenkins server with security groups
 
 ### 1. S3 Static Website Hosting  
 Terraform provisions a private S3 bucket that stores the static website assets (HTML/CSS).
@@ -148,6 +157,7 @@ Deployed website is accessible at:
 
 This project demonstrates:
 
+- **Modular Terraform Architecture**: Organized into reusable modules (storage, compute, networking, security, monitoring, infrastructure)
 - AWS serverless architecture with monitoring and alerting
 - Infrastructure as Code using Terraform with remote state management
 - CI/CD pipelines (GitHub Actions & Jenkins)

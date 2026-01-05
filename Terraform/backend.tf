@@ -1,3 +1,5 @@
+# Backend Configuration
+# Stores Terraform state in S3 with DynamoDB locking
 terraform {
   backend "s3" {
     bucket         = "s3-tfstate-083971419667"
@@ -7,9 +9,11 @@ terraform {
     encrypt        = true
   }
 }
+
+# Commands to set up remote state (run once):
 # terraform init -migrate-state
 
-# Create dynamo db table for lock
+# Create DynamoDB table for state locking:
 # aws dynamodb create-table \
 #   --table-name terraform-locks \
 #   --attribute-definitions AttributeName=LockID,AttributeType=S \
@@ -17,6 +21,6 @@ terraform {
 #   --billing-mode PAY_PER_REQUEST \
 #   --region us-east-1
 
-# Check:
+# Verify table creation:
 # aws dynamodb describe-table --table-name terraform-locks --region us-east-1
 
