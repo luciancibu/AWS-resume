@@ -39,7 +39,7 @@ resource "aws_lambda_alias" "prod" {
 
   routing_config {
     additional_version_weights = {
-      (var.stable_lambda_version) = 0.9
+      (var.stable_lambda_version) = 0.1
     }
   }
 }
@@ -87,7 +87,7 @@ resource "aws_lambda_function" "resume_lambda_likes" {
   environment {
     variables = {
       DYNAMODB_TABLE = aws_dynamodb_table.basic_dynamodb_table.name
-      ITEM_ID        = "views"
+      ITEM_ID        = "likes"
     }
   }
 }

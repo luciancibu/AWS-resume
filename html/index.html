@@ -342,7 +342,6 @@
               >
             </p>
           </article>
-
           <article class="project-item">
             <h3>Selenium Reservation Server (Home Assistant Integration)</h3>
             <p>
@@ -361,6 +360,12 @@
       <div class="views">
         <p id="view-counter">Loading views...</p>
       </div>
+      
+      <div class="Likes">
+      <button id="action-btn" class="btn-primary">Like button</button>
+      <p id="likes">Loading likes...</p>
+      </div>
+
     </div>
 
     <script>
@@ -388,5 +393,38 @@
 
       updateCounter();
     </script>
+
+  <script>
+  async function updateLike() {
+    const API_URL = "https://bxj56szvwk.execute-api.us-east-1.amazonaws.com/likes";
+    const btn = document.getElementById("action-btn");
+    const likesText = document.getElementById("likes");
+
+    const response = await fetch(API_URL);
+    const likesNumber = await response.text();
+    likesText.textContent = `Likes: ${likesNumber}`;
+
+    btn.addEventListener("click", async () => {
+      try {
+        // increment
+        await fetch(API_URL, { method: "PUT" });
+
+        // read updated value
+        const response = await fetch(API_URL);
+        const likesNumber = await response.text();
+
+        likesText.textContent = `Likes: ${likesNumber}`;
+      } catch (err) {
+        console.error(err);
+        likesText.textContent = "Error updating likes";
+      }
+    });
+  }
+
+  updateLike();
+  </script>
+
+
+   
   </body>
 </html>

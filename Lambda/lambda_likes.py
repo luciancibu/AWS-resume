@@ -9,17 +9,27 @@ table = dynamodb.Table(TABLE_NAME)
 
 
 def lambda_handler(event, context):
+    method = event.get("httpMethod") or \
+             event.get("requestContext", {}).get("http", {}).get("method")
     response = table.get_item(Key={"id": ITEM_ID})
-    likes_number = int(response["Item"].get("likes_number", 0)) + 1
+    likes_number = response["Item"]["likes_number"]
 
-    table.put_item(
-        Item={
-            "id": ITEM_ID,
-            "likes_number": likes_number,
+    if method == "GET":
+        return {
+            "statusCode": 200,
+            "body": str(likes_number),
         }
-    )
-    return {
-        "statusCode": 200,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": str(likes_number),
-    }
+
+    if method == "PUT":
+
+        table.put_item(
+            Item={
+                "id": ITEM_ID,
+                "likes_number": likes_number + 1,
+            }
+        )
+
+        return {
+            "statusCode": 200,
+            "body": str(likes_number + 1),
+        }

@@ -14,20 +14,20 @@ sns = boto3.client("sns")
 def lambda_handler(event, context):
 
     params = event.get("queryStringParameters") or {}
+    response = table.get_item(Key={"id": ITEM_ID})
+    views = response["Item"]["views"]
 
     if params.get("read") == "true":
-        response = table.get_item(Key={"id": ITEM_ID})
-        views = response.get("Item", {}).get("views", 0)
-
         return {
             "statusCode": 200,
-            "headers": {"Access-Control-Allow-Origin": "*"},
             "body": str(views),
         }
 
-    response = table.get_item(Key={"id": ITEM_ID})
-    views = response.get("Item", {}).get("views", 0) + 1
-    table.put_item(Item={"id": ITEM_ID, "views": views})
+    table.put_item(
+        Item={
+            "id": ITEM_ID,
+            "views": views + 1
+            })
 
     sns.publish(
         TopicArn=SNS_TOPIC_ARN,
@@ -37,6 +37,5 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
-        "headers": {"Access-Control-Allow-Origin": "*"},
         "body": str(views),
     }

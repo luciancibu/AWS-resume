@@ -29,5 +29,5 @@ variable "accID" {
 
 variable "stable_lambda_version" {
   type    = string
-  default = "10"
+  default = "12"
 }
