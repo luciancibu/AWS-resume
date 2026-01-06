@@ -112,6 +112,45 @@ resource "aws_s3_bucket_public_access_block" "pdf_bucket_block_public" {
   restrict_public_buckets = true
 }
 
+# S3 Bucket for backup lambda files
+resource "aws_s3_bucket" "lambda_bucket" {
+  bucket = "s3-lambda-${var.account_id}"
+
+  tags = {
+    Name    = "s3-lambda"
+    Project = "resume"
+  }
+}
+
+# tfsec:ignore:aws-s3-enable-versioning
+resource "aws_s3_bucket_versioning" "lambda_bucket_versioning" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+  versioning_configuration {
+    status = "Disabled"
+  }
+}
+
+# tfsec:ignore:aws-s3-encryption-customer-key
+resource "aws_s3_bucket_server_side_encryption_configuration" "lambda_bucket_encryption" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "lambda_bucket_block_public" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+
 # DynamoDB Table
 # tfsec:ignore:aws-dynamodb-enable-at-rest-encryption
 resource "aws_dynamodb_table" "resume_table" {
