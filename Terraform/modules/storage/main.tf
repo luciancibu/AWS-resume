@@ -150,7 +150,6 @@ resource "aws_s3_bucket_public_access_block" "lambda_bucket_block_public" {
   restrict_public_buckets = true
 }
 
-
 # DynamoDB Table
 # tfsec:ignore:aws-dynamodb-enable-at-rest-encryption
 resource "aws_dynamodb_table" "resume_table" {

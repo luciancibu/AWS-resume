@@ -2,15 +2,15 @@
 
 This repository contains a serverless resume web application deployed on AWS with Infrastructure as Code (Terraform) and automated CI/CD pipelines (Jenkins + GitHub Actions).
 
-- **S3** (static hosting)
-- **CloudFront** (HTTPS)
-- **Lambda** (Python API)
-- **DynamoDB** (persistent counter)
-- **Terraform** (Infrastructure as Code)
-- **GitHub Actions** (CI/CD pipeline)
-- **Jenkins** (CI/CD pipeline running on EC2)
-
-The goal is to build an automated, infrastructure capable of continuously deploying both backend and frontend components.
+- **S3** (static hosting + Lambda backup + PDF storage)
+- **CloudFront** (HTTPS distribution)
+- **Lambda** (4 Python functions: views, likes, PDF download, rollback)
+- **DynamoDB** (view/like counters)
+- **API Gateway** (HTTP API endpoints)
+- **Terraform** (modular Infrastructure as Code)
+- **GitHub Actions** (CI/CD with matrix deployment)
+- **Jenkins** (alternative CI/CD pipeline)
+- **CloudWatch + SNS** (monitoring and notifications)
 
 ## Project Structure
 
@@ -22,144 +22,149 @@ AWS-resume/
 │     └── styles.css
 │
 ├── Lambda/
-│     ├── lambda_function.py
-│     ├── lambda_likes.py
-│     └── lambda_rollback.py
+│     ├── .pylintrc
+│     ├── lambda_function.py         # View counter + SNS notifications
+│     ├── lambda_likes.py            # Like counter (GET/PUT)
+│     ├── lambda_pdf.py              # PDF download from S3
+│     └── lambda_rollback.py         # Automated rollback handler
 │
 ├── Terraform/
-│     ├── main.tf                    # Main configuration
+│     ├── main.tf                    # Root module configuration
 │     ├── variables.tf               # Root variables
 │     ├── outputs.tf                 # Root outputs
-│     ├── provider.tf                # Provider config
-│     ├── backend.tf                 # Remote state
-│     ├── setup_Jenkins.sh           # Jenkins setup script
+│     ├── provider.tf                # Provider configuration
+│     ├── backend.tf                 # Remote state backend
+│     ├── setup_Jenkins.sh           # Jenkins EC2 setup script
 │     ├── README_MODULES.md          # Module documentation
 │     └── modules/
-│           ├── storage/             # S3 + DynamoDB
-│           ├── compute/             # Lambda functions
-│           ├── networking/          # CloudFront + API Gateway
-│           ├── security/            # IAM roles/policies
-│           ├── monitoring/          # CloudWatch + SNS
-│           └── infrastructure/      # EC2 Jenkins (optional)
+│           ├── storage/             # S3 buckets + DynamoDB + cross-account policies
+│           ├── compute/             # Lambda functions with versioning
+│           ├── networking/          # CloudFront + API Gateway + routes
+│           ├── security/            # IAM roles/policies for all services
+│           ├── monitoring/          # CloudWatch alarms + SNS topics
+│           └── infrastructure/      # Optional EC2 Jenkins server
 │
+├── .github/workflows/
+│     └── main.yml                   # Matrix-based CI/CD pipeline
 │
-├── .github/workflows/main.yml
+├── _tests/                          # Test files (excluded from deployment)
+├── .gitignore
 ├── Jenkinsfile
 └── README.md
 ```
 
 ## Infrastructure Overview (Terraform Modules)
 
-The infrastructure is now organized into reusable Terraform modules for better maintainability and scalability:
+The infrastructure is organized into reusable Terraform modules:
 
 ### Module Architecture
-- **Storage Module**: S3 buckets (website + tfstate) and DynamoDB table
-- **Compute Module**: Lambda functions (main, likes, rollback) with versioning
-- **Networking Module**: CloudFront distribution, API Gateway, and S3 policies
-- **Security Module**: IAM roles and policies for Lambda functions
-- **Monitoring Module**: CloudWatch alarms and SNS topics for notifications
-- **Infrastructure Module**: Optional EC2 Jenkins server with security groups
+- **Storage Module**: 4 S3 buckets (website, tfstate, PDF, Lambda backup) + DynamoDB table + cross-account policies
+- **Compute Module**: 4 Lambda functions with versioning and aliases
+- **Networking Module**: CloudFront distribution + API Gateway HTTP API + 4 routes
+- **Security Module**: IAM roles and policies for all Lambda functions
+- **Monitoring Module**: CloudWatch alarms + SNS topics for notifications
+- **Infrastructure Module**: Optional EC2 Jenkins server
 
-### 1. S3 Static Website Hosting  
-Terraform provisions a private S3 bucket that stores the static website assets (HTML/CSS).
-The bucket does not use S3 Static Website Hosting and is accessible only via CloudFront.
+### 1. S3 Storage (4 Buckets)
+- **Website Bucket**: Private S3 bucket for static assets (HTML/CSS), accessible only via CloudFront OAC
+- **Terraform State Bucket**: Remote state storage with versioning enabled
+- **PDF Bucket**: Stores resume PDF files for download functionality
+- **Lambda Backup Bucket**: Stores Lambda function backups for rollback, includes cross-account access policy for account 083971419667
 
-### 2. CloudFront Distribution  
-CloudFront serves the website over HTTPS, provides custom domain support, and securely accesses the private S3 bucket using Origin Access Control (OAC).
+### 2. CloudFront Distribution
+Serves website over HTTPS with custom domain (resume.lucian-cibu.xyz) using Origin Access Control (OAC).
 
-### 3. DynamoDB Storage  
-- **View Counter**: Stores the number of visits using an item with key `{ id: "views" }`
-- **Like Counter**: Stores the number of likes using an item with key `{ id: "likes" }`
+### 3. DynamoDB Table
+- **View Counter**: Item with key `{ id: "views" }` tracks website visits
+- **Like Counter**: Item with key `{ id: "likes" }` tracks resume likes
 
-### 4. IAM Role & Policies  
-Lambda is granted read/write privileges on DynamoDB.
+### 4. Lambda Functions (Python 3.12)
+- **lambda_function.py**: View counter with SNS notifications for each visit
+- **lambda_likes.py**: Like system (GET to retrieve, PUT to increment)
+- **lambda_pdf.py**: PDF download from S3 with base64 encoding
+- **lambda_rollback.py**: Automated rollback triggered by CloudWatch alarms
 
-### 5. Lambda Functions (Python)  
-- **Main Lambda**: Increments and returns the website view counter with visitor analytics
-- **Likes Lambda**: Handles GET requests to retrieve current like count and PUT requests to increment likes for the resume
-- **Download Lambda**: Serves resume PDF files from S3 with download tracking and analytics
-- **Rollback Lambda**: Automated rollback mechanism triggered by CloudWatch alarms
-Lambda functions are invoked through API Gateway (HTTP API) and are not publicly exposed.
+### 5. API Gateway (HTTP API)
+4 routes with CORS configuration:
+- `GET /view` → View counter Lambda
+- `GET /likes` → Likes Lambda (retrieve)
+- `PUT /likes` → Likes Lambda (increment)
+- `GET /pdf` → PDF download Lambda
 
-### 6. API Gateway (HTTP API)
-Provides a public HTTPS endpoint for the Lambda function, handling request routing and access control.
-The frontend calls API Gateway instead of invoking Lambda directly.
+### 6. Monitoring & Notifications
+- **CloudWatch Alarms**: Monitor Lambda errors and trigger rollbacks
+- **SNS Topics**: Email notifications for views and rollback alerts
 
-### 7. EC2 Jenkins Server  
-Terraform provisions an EC2 instance with Jenkins installed via a bootstrap script.
+### 7. Security
+- **IAM Roles**: Separate roles for each Lambda function with least privilege
+- **Cross-Account Access**: Lambda backup bucket accessible from account 083971419667
 
-### 8. Security Groups  
-SSH limited to your IP, Jenkins exposed on port 8080.
-
-### 9. GitHub Actions CI/CD  
-Deploys the frontend, backend, and invalidates CloudFront cache automatically on push.
-
-### 10. CloudWatch Monitoring  
-CloudWatch alarms monitor Lambda function errors and trigger automated rollbacks via SNS.
-
-### 11. SNS Notifications  
-SNS topics handle email notifications for new resume views and automated rollback alerts.
-
-### 12. Testing Infrastructure  
-Comprehensive test suite including unit tests, integration tests, and infrastructure validation.
-
-### 13. Jenkins CI/CD  
-Additional CI/CD pipeline executing Lambda + S3 + CloudFront updates.
+### 8. Optional Jenkins Infrastructure
+EC2 instance with Jenkins, security groups, and SSH key pair.
 
 ## Deployment Flow
 
 ```
 User → CloudFront → S3 (Static Site)
      ↓
-     API Gateway → Lambda Functions → DynamoDB
-                        ↓
-                    SNS Topics → Email Notifications
-                        ↓
-                CloudWatch Alarms → Rollback Lambda
+     API Gateway (4 routes) → Lambda Functions → DynamoDB/S3
+                                    ↓
+                              SNS Topics → Email Notifications
+                                    ↓
+                            CloudWatch Alarms → Rollback Lambda
 ```
 
 **Normal Flow:**
 1. User visits website → CloudFront serves static content from S3
-2. JavaScript calls API Gateway endpoints (`/view`, `/likes`, `/pdf`)
-3. Lambda functions process requests and update DynamoDB counters
-4. Main Lambda sends SNS notification for each view with visitor analytics
-5. Likes Lambda handles like button interactions (GET/PUT requests)
-6. Download Lambda retrieves resume PDF from S3 and tracks download metrics
+2. JavaScript calls API Gateway endpoints:
+   - `GET /view` → Increment view counter + SNS notification
+   - `GET /likes` → Retrieve current like count
+   - `PUT /likes` → Increment like counter
+   - `GET /pdf` → Download resume PDF from S3
+3. Lambda functions process requests and update DynamoDB/S3
+4. View Lambda sends SNS notification for each visit
 
-**Error Handling Flow:**
+**Error Handling & Rollback:**
 1. CloudWatch monitors Lambda function errors
 2. If errors exceed threshold → CloudWatch alarm triggers
-3. CloudWatch alarm publishes to SNS rollback topic
-4. SNS triggers Rollback Lambda function
-5. Rollback Lambda automatically reverts to stable version
-6. Email notifications sent for both visitor analytics and rollback alerts
+3. SNS publishes to rollback topic → Rollback Lambda executes
+4. Rollback Lambda reverts to stable version using aliases
+5. Email notifications sent for both analytics and rollback alerts
 
-CI/CD:
+**CI/CD Pipelines:**
 
 ```
-GitHub Push → GitHub Actions ────────────────┐
-                                              ├ Deploy to AWS
-Jenkins (EC2) ───────────────────────────────┘
+GitHub Push → GitHub Actions (Matrix Strategy) ────┐
+                                                    ├ Deploy to AWS
+Jenkins (EC2) ─────────────────────────────────────┘
 ```
+
+## CI/CD Features
+
+### GitHub Actions (Matrix Strategy)
+- **Path-based deployment**: Only deploys changed components (HTML, Lambda, Terraform)
+- **Matrix deployment**: Deploys 4 Lambda functions in parallel with individual configurations
+- **Versioning**: Main Lambda uses versioning with aliases and canary deployments
+- **Rollback**: Automatic rollback on smoke test failures
+- **Code Quality**: Flake8 linting and Pylint static analysis
+- **Backup**: Non-versioned Lambdas backed up to S3 before deployment
+
+### Jenkins Pipeline
+- Alternative CI/CD pipeline running on EC2
+- Deploys Lambda functions and syncs HTML to S3
+- CloudFront cache invalidation
 
 ## Public URL
 
-Deployed website is accessible at:
-
 **https://resume.lucian-cibu.xyz**
-
 
 ## Summary
 
-This project demonstrates:
-
-- **Modular Terraform Architecture**: Organized into reusable modules (storage, compute, networking, security, monitoring, infrastructure)
-- AWS serverless architecture with monitoring and alerting
-- Infrastructure as Code using Terraform with remote state management
-- CI/CD pipelines (GitHub Actions & Jenkins)
-- API Gateway used as a secure public entry point for Lambda functions
-- Dynamic backend using multiple Lambda functions + DynamoDB
-- Automated CloudFront cache invalidation
-- CloudWatch monitoring with automated rollback capabilities
-- SNS-based notification system for visitor analytics
-- Lambda versioning and canary deployments
+- **Modular Terraform Architecture**: 6 reusable modules with clear separation of concerns
+- **Serverless Architecture**: 4 Lambda functions + API Gateway + DynamoDB + S3
+- **CI/CD**: Matrix-based deployments with path filtering and automated rollbacks
+- **Monitoring & Alerting**: CloudWatch alarms + SNS notifications + automated rollback
+- **Security**: Cross-account S3 policies, IAM least privilege, private buckets with OAC
+- **Scalability**: Lambda versioning, aliases, and canary deployments
+- **Code Quality**: Automated linting, static analysis, and smoke testing
+- **Multi-functionality**: View counter, like system, PDF downloads, and visitor analytics

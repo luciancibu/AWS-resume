@@ -11,7 +11,7 @@ on:
 env:
   LAMBDA_FUNCTION: lambda-terraform
   S3_BUCKET: s3-terraform-083971419667
-  S3_BUCKET_TF_STATE: s3-tfstate-083971419667
+  S3_BUCKET_LAMBDA: s3-lambda-083971419667
   CLOUDFRONT_DISTRIBUTION_ID: E99RBQPV79L7R
   VERSIONED_LAMBDA_ALIAS: prod
   APIGW_URL: https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com
@@ -27,6 +27,7 @@ jobs:
       lambda_rollback: ${{ steps.filter.outputs.lambda_rollback }}
       html: ${{ steps.filter.outputs.html }}
       terraform: ${{ steps.filter.outputs.terraform }}
+      lambda: ${{ steps.filter.outputs.lambda }}
 
     steps:
       - name: Checkout repository
@@ -41,6 +42,8 @@ jobs:
               - "html/**"
             terraform:
               - "Terraform/**"
+            lambda:
+              - "Lambda/**"
             lambda_function:
               - "Lambda/lambda_function.py"
             lambda_likes:
@@ -86,6 +89,7 @@ jobs:
             --paths "/*"
 
   deploy_lambda:
+    if: needs.detect_changes.outputs.lambda == 'true'
     needs: detect_changes
     runs-on: ubuntu-latest
     strategy:
@@ -155,6 +159,20 @@ jobs:
             --output text)
           echo "old=$OLD_VERSION" >> $GITHUB_OUTPUT
 
+      - name: Backup current NON versioned Lambda code to S3
+        if: matrix.lambda.versioned == false
+        id: current_non_versioned
+        run: |
+          CODE_URL=$(aws lambda get-function \
+            --function-name ${{ matrix.lambda.aws_name }} \
+            --query Code.Location \
+            --output text)
+
+          curl -sS "$CODE_URL" -o ${{ matrix.lambda.aws_name }}.zip
+
+          aws s3 cp ${{ matrix.lambda.aws_name }}.zip \
+            s3://${{ env.S3_BUCKET_LAMBDA }}/${{ matrix.lambda.aws_name }}.zip
+
       - name: Deploy Lambda code (update-function-code)
         if: needs.detect_changes.outputs[matrix.lambda.key] == 'true'      
         run: |
@@ -204,10 +222,21 @@ jobs:
             --name ${{ env.VERSIONED_LAMBDA_ALIAS }} \
             --function-version ${{ steps.current.outputs.old }}
 
+      - name: Rollback non versioned lambda to previous version
+        if: matrix.lambda.versioned == false && steps.smoke.outcome == 'failure'
+        run: |
+          aws s3 cp \
+            s3://${{ env.S3_BUCKET_LAMBDA }}/${{ matrix.lambda.aws_name }}.zip \
+            rollback.zip
+
+          aws lambda update-function-code \
+            --function-name ${{ matrix.lambda.aws_name }} \
+            --zip-file fileb://rollback.zip
+            
       - name: Fail workflow if smoke test failed
         if: steps.smoke.outcome == 'failure'
-        run: exit 1
-
+        run: exit 1            
+  
   deploy_terraform:
     needs: detect_changes
     if: needs.detect_changes.outputs.terraform == 'true'
