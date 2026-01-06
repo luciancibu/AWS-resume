@@ -13,28 +13,42 @@ env:
   S3_BUCKET: s3-terraform-083971419667
   S3_BUCKET_TF_STATE: s3-tfstate-083971419667
   CLOUDFRONT_DISTRIBUTION_ID: E99RBQPV79L7R
+  VERSIONED_LAMBDA_ALIAS: prod
+  APIGW_URL: https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com
   AWS_REGION: us-east-1
 
 jobs:
   detect_changes:
     runs-on: ubuntu-latest
     outputs:
+      lambda_function: ${{ steps.filter.outputs.lambda_function }}
+      lambda_likes: ${{ steps.filter.outputs.lambda_likes }}
+      lambda_pdf: ${{ steps.filter.outputs.lambda_pdf }}
+      lambda_rollback: ${{ steps.filter.outputs.lambda_rollback }}
       html: ${{ steps.filter.outputs.html }}
-      lambda: ${{ steps.filter.outputs.lambda }}
       terraform: ${{ steps.filter.outputs.terraform }}
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: dorny/paths-filter@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect changed components
+        uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
             html:
-              - 'html/**'
-            lambda:
-              - 'Lambda/**'
+              - "html/**"
             terraform:
-              - 'Terraform/**'
+              - "Terraform/**"
+            lambda_function:
+              - "Lambda/lambda_function.py"
+            lambda_likes:
+              - "Lambda/lambda_likes.py"
+            lambda_pdf:
+              - "Lambda/lambda_pdf.py"
+            lambda_rollback:
+              - "Lambda/lambda_rollback.py"           
 
   deploy_html:
     needs: detect_changes
@@ -73,9 +87,32 @@ jobs:
 
   deploy_lambda:
     needs: detect_changes
-    if: needs.detect_changes.outputs.lambda == 'true'
     runs-on: ubuntu-latest
-    steps:
+    strategy:
+      matrix:
+        lambda:
+          - key: lambda_function
+            file: lambda_function.py
+            aws_name: lambda-terraform
+            versioned: true
+            smoke_url: view?read=true
+          - key: lambda_likes
+            file: lambda_likes.py
+            aws_name: lambda-terraform-likes
+            versioned: false
+            smoke_url: likes
+          - key: lambda_pdf
+            file: lambda_pdf.py
+            aws_name: lambda-terraform-pdf
+            versioned: false
+            smoke_url: pdf
+          - key: lambda_rollback
+            file: lambda_rollback.py
+            aws_name: lambda-rollback-handler
+            versioned: false
+            smoke_url: ''
+
+    steps:    
       - name: Checkout source code    
         uses: actions/checkout@v4
 
@@ -89,6 +126,17 @@ jobs:
           pip install --upgrade pip
           pip install flake8 pylint==3.0.3 astroid==3.0.3
 
+      - name: Style Check(flake8)
+        run: flake8 ${{ matrix.lambda.file }}
+        working-directory: Lambda
+
+      - name: Static Analysis Report(pylint)
+        run: |
+          pylint ${{ matrix.lambda.file }} --output-format=parseable > pylint-report.txt || true
+          echo "===== PYLINT REPORT ====="
+          cat pylint-report.txt          
+        working-directory: Lambda
+        
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -96,21 +144,73 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Style Check(flake8)
-        run: flake8 .
-        working-directory: Lambda
-        
-      - name: Static Analysis Report(pylint)
+      - name: Get current alias version
+        if: matrix.lambda.versioned == true
+        id: current
         run: |
-          pylint *.py --output-format=parseable > pylint-report.txt || true
-          echo "===== PYLINT REPORT ====="
-          cat pylint-report.txt          
-        working-directory: Lambda
+          OLD_VERSION=$(aws lambda get-alias \
+            --function-name ${{ matrix.lambda.aws_name }} \
+            --name ${{ env.VERSIONED_LAMBDA_ALIAS }} \
+            --query FunctionVersion \
+            --output text)
+          echo "old=$OLD_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Deploy Lambda code (update-function-code)
+        if: needs.detect_changes.outputs[matrix.lambda.key] == 'true'      
+        run: |
+          cd Lambda
+          zip -j lambda.zip ${{ matrix.lambda.file }}
+          aws lambda update-function-code \
+            --function-name ${{ matrix.lambda.aws_name }} \
+            --zip-file fileb://lambda.zip
+
+      - name: Wait for Lambda update to finish
+        run: |
+          aws lambda wait function-updated \
+            --function-name ${{ matrix.lambda.aws_name }}
+
+      - name: Publish new version
+        if: matrix.lambda.versioned == true
+        id: publish
+        run: |
+          NEW_VERSION=$(aws lambda publish-version \
+            --function-name ${{ matrix.lambda.aws_name }} \
+            --query Version \
+            --output text)
+          echo "new=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Point alias to new version
+        if: matrix.lambda.versioned == true
+        run: |
+          aws lambda update-alias \
+            --function-name ${{ matrix.lambda.aws_name }} \
+            --name ${{ env.VERSIONED_LAMBDA_ALIAS }} \
+            --function-version ${{ steps.publish.outputs.new }}
+
+      - name: Smoke test
+        id: smoke
+        continue-on-error: true
+        if: needs.detect_changes.outputs[matrix.lambda.key] == 'true'  && matrix.lambda.smoke_url != ''
+        run: |
+          SMOKE_URL="${APIGW_URL}/${{ matrix.lambda.smoke_url }}"
+          echo "Smoke testing: $SMOKE_URL"
+          curl -fsS "$SMOKE_URL"
+
+      - name: Rollback alias to previous version
+        if: matrix.lambda.versioned == true && steps.smoke.outcome == 'failure'
+        run: |
+          aws lambda update-alias \
+            --function-name ${{ matrix.lambda.aws_name }} \
+            --name ${{ env.VERSIONED_LAMBDA_ALIAS }} \
+            --function-version ${{ steps.current.outputs.old }}
+
+      - name: Fail workflow if smoke test failed
+        if: steps.smoke.outcome == 'failure'
+        run: exit 1
 
   deploy_terraform:
-    needs:
-      - detect_changes
-    if: needs.detect_changes.outputs.terraform == 'true' || needs.detect_changes.outputs.lambda == 'true'
+    needs: detect_changes
+    if: needs.detect_changes.outputs.terraform == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -157,5 +257,5 @@ jobs:
         run: exit 1        
 
       - name: terraform Apply
-        # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false planfile        
