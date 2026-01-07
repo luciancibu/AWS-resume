@@ -11,8 +11,8 @@ from aws_cdk import (
 
 from constructs.storage import StorageConstruct
 from constructs.networking import NetworkingConstruct
-
-
+from constructs.security import SecurityConstruct
+from constructs.compute import ComputeConstruct
 
 class AwsResumeCdkStack(Stack):
 
@@ -31,4 +31,17 @@ class AwsResumeCdkStack(Stack):
             account=self.account,
             region=self.region            
         )
-        
+
+        security = SecurityConstruct(
+            self, "Security",
+            account_id=self.account,
+            region=self.region,
+        )     
+           
+        compute = ComputeConstruct(
+            self, "Compute",
+            account=self.account,
+            region=self.region,            
+            lambda_role=security.lambda_role
+        )        
+                
