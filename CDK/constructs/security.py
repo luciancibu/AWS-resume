@@ -1,13 +1,15 @@
 from aws_cdk import (
     aws_iam as iam,
     aws_dynamodb as dynamodb,
+    aws_sns as sns,
+
 )
 from constructs import Construct
 
 
 class SecurityConstruct(Construct):
     def __init__(self, scope: Construct, construct_id: str, account_id: str, region: str,
-                 dynamodb_table: dynamodb.Table, **kwargs) -> None:
+                 dynamodb_table: dynamodb.Table, sns_topic: sns.Topic, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # Lambda execution role
@@ -31,4 +33,12 @@ class SecurityConstruct(Construct):
                 ],
                 resources=[dynamodb_table.table_arn]
             )
-        )        
+        )
+
+        self.lambda_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=["sns:Publish"],
+                resources=[sns_topic.topic_arn]
+            )
+        )

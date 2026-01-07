@@ -13,6 +13,8 @@ from constructs.storage import StorageConstruct
 from constructs.networking import NetworkingConstruct
 from constructs.security import SecurityConstruct
 from constructs.compute import ComputeConstruct
+from constructs.monitoring import MonitoringConstruct
+
 
 class AwsResumeCdkStack(Stack):
 
@@ -32,18 +34,27 @@ class AwsResumeCdkStack(Stack):
             region=self.region            
         )
 
+        monitoring = MonitoringConstruct(
+            self, "Monitoring",
+            account=self.account,
+            region=self.region,
+            notification_email="luciancibu@yahoo.com"
+        )           
+                
         security = SecurityConstruct(
             self, "Security",
             account_id=self.account,
             region=self.region,
-            dynamodb_table=storage.dynamodb_table
-        )     
+            dynamodb_table=storage.dynamodb_table,
+            sns_topic=monitoring.resume_sns_topic
+        ) 
            
         compute = ComputeConstruct(
             self, "Compute",
             account=self.account,
             region=self.region,            
             lambda_role=security.lambda_role,
-            dynamodb_table=storage.dynamodb_table
-        )        
-                
+            dynamodb_table=storage.dynamodb_table,
+            sns_topic=monitoring.resume_sns_topic
+        )     
+

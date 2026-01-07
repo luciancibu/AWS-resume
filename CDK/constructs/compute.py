@@ -2,6 +2,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_iam as iam,
     aws_dynamodb as dynamodb,
+    aws_sns as sns,
     Duration
 )
 from constructs import Construct
@@ -9,7 +10,7 @@ from constructs import Construct
 
 class ComputeConstruct(Construct):
     def __init__(self, scope: Construct, construct_id: str, account: str, region: str, 
-                 lambda_role: iam.Role, dynamodb_table: dynamodb.Table, **kwargs) -> None:
+                 lambda_role: iam.Role, dynamodb_table: dynamodb.Table, sns_topic: sns.Topic, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # View counter Lambda
@@ -23,7 +24,7 @@ class ComputeConstruct(Construct):
             timeout=Duration.seconds(5),
             environment={
                 "DYNAMODB_TABLE": dynamodb_table.table_name,
-                # "SNS_TOPIC_ARN": sns_topic_arn,
+                "SNS_TOPIC_ARN": sns_topic.topic_arn,
                 "ITEM_ID": "views"
             }
         )
