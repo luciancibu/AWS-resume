@@ -1,12 +1,8 @@
 from constructs import Construct
 from aws_cdk import (
-    Duration,
     Stack,
+    CfnOutput,
     aws_iam as iam,
-    aws_sqs as sqs,
-    aws_sns as sns,
-    aws_s3 as s3,
-    aws_sns_subscriptions as subs,
 )
 
 from constructs.storage import StorageConstruct
@@ -55,6 +51,23 @@ class AwsResumeCdkStack(Stack):
             pdf_bucket=storage.pdf_bucket,
         )
 
+        # Update monitoring with Lambda references
+        monitoring.setup_lambda_monitoring(
+            rollback_lambda=compute.rollback_lambda,
+            resume_lambda=compute.resume_lambda,
+            account=self.account,
+            region=self.region            
+        )
+
+        # Add SNS policy to Lambda role after topic creation
+        security.lambda_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=["sns:Publish"],
+                resources=[monitoring.resume_sns_topic.topic_arn]
+            )
+        )
+
         networking = NetworkingConstruct(
             self, "Networking",
             website_bucket=storage.website_bucket,
@@ -65,3 +78,15 @@ class AwsResumeCdkStack(Stack):
             region=self.region
         )
 
+        # Outputs
+        CfnOutput(
+            self, "CloudFrontDistributionId",
+            value=networking.distribution.distribution_id,
+            description="CloudFront distribution ID"
+        )
+
+        CfnOutput(
+            self, "ApiGatewayUrl",
+            value=networking.api.url,
+            description="API Gateway URL"
+        )

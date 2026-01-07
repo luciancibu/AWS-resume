@@ -36,14 +36,6 @@ class SecurityConstruct(Construct):
             )
         )
 
-        self.lambda_role.add_to_policy(
-            iam.PolicyStatement(
-                effect=iam.Effect.ALLOW,
-                actions=["sns:Publish"],
-                resources=[sns_topic.topic_arn]
-            )
-        )
-
         # Lambda PDF execution role
         self.pdf_lambda_role = iam.Role(
             self, "PdfLambdaRole",
