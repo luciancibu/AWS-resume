@@ -9,6 +9,7 @@ class StorageConstruct(Construct):
     def __init__(self, scope: Construct, construct_id: str, account: str, region: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         
+        # S3 Bucket for website hosting
         self.website_bucket = s3.Bucket(
             self,
             "WebsiteBucket",
@@ -17,7 +18,17 @@ class StorageConstruct(Construct):
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             encryption=s3.BucketEncryption.S3_MANAGED,
             removal_policy=RemovalPolicy.DESTROY,
-        )  
+        )
+
+        self.pdf_bucket = s3.Bucket(
+            self,
+            "PdfBucket",
+            bucket_name=f"s3-pdf-cdk-{account}-{region}",
+            public_read_access=False,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            removal_policy=RemovalPolicy.DESTROY,
+        )          
 
         # DynamoDB table
         self.dynamodb_table = dynamodb.Table(

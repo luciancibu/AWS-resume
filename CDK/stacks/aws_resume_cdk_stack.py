@@ -39,7 +39,8 @@ class AwsResumeCdkStack(Stack):
             account_id=self.account,
             region=self.region,
             dynamodb_table=storage.dynamodb_table,
-            sns_topic=monitoring.resume_sns_topic
+            sns_topic=monitoring.resume_sns_topic,
+            pdf_bucket=storage.pdf_bucket,
         )
 
         compute = ComputeConstruct(
@@ -49,6 +50,8 @@ class AwsResumeCdkStack(Stack):
             lambda_role=security.lambda_role,
             dynamodb_table=storage.dynamodb_table,
             sns_topic=monitoring.resume_sns_topic,
+            pdf_lambda_role=security.pdf_lambda_role,
+            pdf_bucket=storage.pdf_bucket,
         )
 
         networking = NetworkingConstruct(
