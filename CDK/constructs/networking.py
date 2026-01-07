@@ -33,9 +33,13 @@ class NetworkingConstruct(Construct):
         self.api = apigw.HttpApi(
             self,
             "ResumeApi",
-            api_name=f"ResumeApi-cdk-{account}-{region}"
+            api_name=f"ResumeApi-cdk-{account}-{region}",
+            cors_preflight=apigw.CorsPreflightOptions(
+                allow_origins=["*"],
+                allow_methods=[apigw.CorsHttpMethod.GET, apigw.CorsHttpMethod.PUT, apigw.CorsHttpMethod.OPTIONS],
+                allow_headers=["*"],
+            ),
         )
-
         # Lambda integrations
         view_integration = integrations.HttpLambdaIntegration(
             "ViewIntegration",
