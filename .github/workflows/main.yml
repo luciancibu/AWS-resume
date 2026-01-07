@@ -7,6 +7,7 @@ on:
       - html/**
       - Lambda/**
       - Terraform/**
+      - CDK/**
   workflow_dispatch:
 env:
   LAMBDA_FUNCTION: lambda-terraform
@@ -28,6 +29,7 @@ jobs:
       html: ${{ steps.filter.outputs.html }}
       terraform: ${{ steps.filter.outputs.terraform }}
       lambda: ${{ steps.filter.outputs.lambda }}
+      cdk: ${{ steps.filter.outputs.cdk }}
 
     steps:
       - name: Checkout repository
@@ -38,6 +40,8 @@ jobs:
         id: filter
         with:
           filters: |
+            cdk:
+              - "CDK/**"          
             html:
               - "html/**"
             terraform:
@@ -51,7 +55,7 @@ jobs:
             lambda_pdf:
               - "Lambda/lambda_pdf.py"
             lambda_rollback:
-              - "Lambda/lambda_rollback.py"           
+              - "Lambda/lambda_rollback.py"
 
   deploy_html:
     needs: detect_changes
@@ -286,4 +290,46 @@ jobs:
         run: exit 1        
 
       - name: terraform Apply
-        run: terraform apply -auto-approve -input=false planfile        
+        run: terraform apply -auto-approve -input=false planfile
+
+  deploy_cdk:
+    needs: detect_changes
+    if: needs.detect_changes.outputs.cdk == 'true'
+    runs-on: ubuntu-latest    
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install AWS CDK
+        run: npm install -g aws-cdk
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: ./CDK
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: CDK Synth
+        run: cdk synth
+        working-directory: ./CDK
+
+      - name: CDK Deploy
+        run: cdk deploy --require-approval never
+        working-directory: ./CDK
