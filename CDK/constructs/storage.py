@@ -1,6 +1,7 @@
 from aws_cdk import (
     RemovalPolicy,
-    aws_s3 as s3
+    aws_s3 as s3,
+    aws_dynamodb as dynamodb,
 )
 from constructs import Construct
 
@@ -24,3 +25,16 @@ class StorageConstruct(Construct):
             website_index_document="index.html",
             website_error_document="error.html"
         )  
+
+        # DynamoDB table
+        self.dynamodb_table = dynamodb.Table(
+            self, "ResumeTable",
+            table_name=f"dynamodb-terraform-{account}-{region}",
+            partition_key=dynamodb.Attribute(
+                name="id",
+                type=dynamodb.AttributeType.STRING
+            ),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            point_in_time_recovery=True,
+            removal_policy=RemovalPolicy.DESTROY
+        )

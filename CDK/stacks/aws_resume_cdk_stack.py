@@ -36,12 +36,14 @@ class AwsResumeCdkStack(Stack):
             self, "Security",
             account_id=self.account,
             region=self.region,
+            dynamodb_table=storage.dynamodb_table
         )     
            
         compute = ComputeConstruct(
             self, "Compute",
             account=self.account,
             region=self.region,            
-            lambda_role=security.lambda_role
+            lambda_role=security.lambda_role,
+            dynamodb_table=storage.dynamodb_table
         )        
                 
