@@ -4,7 +4,8 @@ from aws_cdk import (
     aws_cloudfront_origins as origins,
     aws_apigatewayv2 as apigw,
     aws_apigatewayv2_integrations as integrations,    
-    aws_logs as logs
+    aws_logs as logs,
+    aws_certificatemanager as acm
 )
 from constructs import Construct
 
@@ -13,6 +14,13 @@ class NetworkingConstruct(Construct):
                 resume_lambda_alias: _lambda.IFunction, likes_lambda: _lambda.IFunction, pdf_lambda: _lambda.IFunction, 
                 **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        # ACM Certificate for CloudFront
+        certificate = acm.Certificate.from_certificate_arn(
+            self,
+            "ResumeWildcardCert",
+            "arn:aws:acm:us-east-1:083971419667:certificate/4a7a34ba-11ad-4555-ad9d-47a3e9adebf5",
+        )
 
         # CloudFront Distribution (without custom domain for simplicity)
         self.distribution = cloudfront.Distribution(
@@ -27,6 +35,8 @@ class NetworkingConstruct(Construct):
             default_root_object="index.html",
             price_class=cloudfront.PriceClass.PRICE_CLASS_100,
             http_version=cloudfront.HttpVersion.HTTP2_AND_3,
+            domain_names=["resume.kakosnita.xyz"],
+            certificate=certificate,            
         )
         
          # API Gateway
