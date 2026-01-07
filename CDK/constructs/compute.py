@@ -12,7 +12,7 @@ from constructs import Construct
 class ComputeConstruct(Construct):
     def __init__(self, scope: Construct, construct_id: str, account: str, region: str, 
                  lambda_role: iam.Role, dynamodb_table: dynamodb.Table, sns_topic: sns.Topic,
-                 pdf_lambda_role: iam.Role, pdf_bucket: s3.Bucket, **kwargs) -> None:
+                 pdf_lambda_role: iam.Role, pdf_bucket: s3.Bucket, rollback_lambda_role: iam.Role, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # View counter Lambda
@@ -68,6 +68,21 @@ class ComputeConstruct(Construct):
             timeout=Duration.seconds(5),
             environment={
                 "BUCKET_NAME": pdf_bucket.bucket_name,
-                "ITEM_NAME": "resume.pdf"
+                "ITEM_NAME": "lucian_cibu_resume.pdf"
+            }
+        )
+
+        # Rollback Lambda
+        self.rollback_lambda = _lambda.Function(
+            self, "RollbackLambda",
+            function_name=f"lambda-rollback-{account}-{region}",
+            runtime=_lambda.Runtime.PYTHON_3_12,
+            handler="lambda_rollback.lambda_handler",
+            code=_lambda.Code.from_asset("../Lambda"),
+            role=rollback_lambda_role,
+            environment={
+                "TARGET_FUNCTION_NAME": self.resume_lambda.function_name,
+                "ALIAS_NAME": "prodcdk",
+                "STABLE_VERSION": "1"
             }
         )

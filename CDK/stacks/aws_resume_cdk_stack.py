@@ -48,9 +48,10 @@ class AwsResumeCdkStack(Stack):
             account=self.account,
             region=self.region,
             lambda_role=security.lambda_role,
+            pdf_lambda_role=security.pdf_lambda_role,
+            rollback_lambda_role=security.rollback_lambda_role,            
             dynamodb_table=storage.dynamodb_table,
             sns_topic=monitoring.resume_sns_topic,
-            pdf_lambda_role=security.pdf_lambda_role,
             pdf_bucket=storage.pdf_bucket,
         )
 

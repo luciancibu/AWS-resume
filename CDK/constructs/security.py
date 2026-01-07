@@ -59,6 +59,27 @@ class SecurityConstruct(Construct):
           iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
                 actions=["s3:GetObject"],
-                resources=[f"{pdf_bucket.bucket_arn}/resume.pdf"]
+                resources=[f"{pdf_bucket.bucket_arn}/lucian_cibu_resume.pdf"]
             )
         )        
+
+        # Rollback Lambda role
+        self.rollback_lambda_role = iam.Role(
+            self, "RollbackLambdaRole",
+            role_name=f"rollback-lambda-role-{account_id}-{region}",
+            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole")
+            ]
+        )
+
+        self.rollback_lambda_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "lambda:GetAlias",
+                    "lambda:UpdateAlias"
+                ],
+                resources=[f"arn:aws:lambda:{region}:{account_id}:function:*"]
+            )
+        )
