@@ -15,18 +15,17 @@ class NetworkingConstruct(Construct):
 
         # CloudFront Distribution (without custom domain for simplicity)
         self.distribution = cloudfront.Distribution(
-            self, "ResumeDistribution",
+            self,
+            "ResumeDistribution",
             default_behavior=cloudfront.BehaviorOptions(
-                origin=origins.S3Origin(
-                    bucket=website_bucket,
-                ),
+                origin=origins.S3Origin(website_bucket),
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED,
                 compress=True,
-                cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED
             ),
             default_root_object="index.html",
             price_class=cloudfront.PriceClass.PRICE_CLASS_100,
-            http_version=cloudfront.HttpVersion.HTTP2_AND_3
+            http_version=cloudfront.HttpVersion.HTTP2_AND_3,
         )
         
          # API Gateway
