@@ -1,6 +1,6 @@
-# AWS Serverless Resume with Terraform | Jenkins | GitHub Actions
+# AWS Serverless Resume with Terraform | CDK | Jenkins | GitHub Actions
 
-This repository contains a serverless resume web application deployed on AWS with Infrastructure as Code (Terraform) and automated CI/CD pipelines (Jenkins + GitHub Actions).
+This repository contains a serverless resume web application deployed on AWS with Infrastructure as Code (Terraform + CDK) and automated CI/CD pipelines (GitHub Actions).
 
 - **S3** (static hosting + Lambda backup + PDF storage)
 - **CloudFront** (HTTPS distribution)
@@ -8,8 +8,8 @@ This repository contains a serverless resume web application deployed on AWS wit
 - **DynamoDB** (view/like counters)
 - **API Gateway** (HTTP API endpoints)
 - **Terraform** (modular Infrastructure as Code)
+- **AWS CDK** (Python-based Infrastructure as Code alternative)
 - **GitHub Actions** (CI/CD with matrix deployment)
-- **Jenkins** (alternative CI/CD pipeline)
 - **CloudWatch + SNS** (monitoring and notifications)
 
 ## Project Structure
@@ -36,6 +36,7 @@ AWS-resume/
 │     ├── backend.tf                 # Remote state backend
 │     ├── setup_Jenkins.sh           # Jenkins EC2 setup script
 │     ├── README_MODULES.md          # Module documentation
+│     ├── .tfsec/config.yml          # TFSec security configuration
 │     └── modules/
 │           ├── storage/             # S3 buckets + DynamoDB + cross-account policies
 │           ├── compute/             # Lambda functions with versioning
@@ -44,8 +45,24 @@ AWS-resume/
 │           ├── monitoring/          # CloudWatch alarms + SNS topics
 │           └── infrastructure/      # Optional EC2 Jenkins server
 │
+├── CDK/
+│     ├── app.py                     # CDK application entry point
+│     ├── cdk.json                   # CDK configuration
+│     ├── requirements.txt           # Python dependencies
+│     ├── requirements-dev.txt       # Development dependencies
+│     ├── stacks/
+│     │     └── aws_resume_cdk_stack.py  # Main CDK stack
+│     ├── constructs/
+│     │     ├── storage.py           # S3 + DynamoDB constructs
+│     │     ├── compute.py           # Lambda constructs
+│     │     ├── networking.py        # CloudFront + API Gateway constructs
+│     │     ├── security.py          # IAM constructs
+│     │     └── monitoring.py        # CloudWatch + SNS constructs
+│     └── tests/
+│           └── unit/                # CDK unit tests
+│
 ├── .github/workflows/
-│     └── main.yml                   # Matrix-based CI/CD pipeline
+│     └── main.yml                   # Matrix-based CI/CD pipeline (Terraform + CDK)
 │
 ├── _tests/                          # Test files (excluded from deployment)
 ├── .gitignore
@@ -53,9 +70,12 @@ AWS-resume/
 └── README.md
 ```
 
-## Infrastructure Overview (Terraform Modules)
+## Infrastructure Overview
 
-The infrastructure is organized into reusable Terraform modules:
+The infrastructure can be deployed using either **Terraform modules** or **AWS CDK constructs**:
+
+### Terraform Implementation
+The Terraform infrastructure is organized into reusable modules:
 
 ### Module Architecture
 - **Storage Module**: 4 S3 buckets (website, tfstate, PDF, Lambda backup) + DynamoDB table + cross-account policies
@@ -99,9 +119,6 @@ Serves website over HTTPS with custom domain (resume.lucian-cibu.xyz) using Orig
 - **IAM Roles**: Separate roles for each Lambda function with least privilege
 - **Cross-Account Access**: Lambda backup bucket accessible from account 083971419667
 
-### 8. Optional Jenkins Infrastructure
-EC2 instance with Jenkins, security groups, and SSH key pair.
-
 ## Deployment Flow
 
 ```
@@ -134,25 +151,33 @@ User → CloudFront → S3 (Static Site)
 **CI/CD Pipelines:**
 
 ```
-GitHub Push → GitHub Actions (Matrix Strategy) ────┐
-                                                    ├ Deploy to AWS
-Jenkins (EC2) ─────────────────────────────────────┘
+GitHub Push → GitHub Actions (Matrix Strategy) ──── Deploy to AWS
+                ├ Terraform Deployment             
+                └ CDK Deployment                   
+                                                    
 ```
 
 ## CI/CD Features
 
 ### GitHub Actions (Matrix Strategy)
-- **Path-based deployment**: Only deploys changed components (HTML, Lambda, Terraform)
+- **Path-based deployment**: Only deploys changed components (HTML, Lambda, Terraform, CDK)
 - **Matrix deployment**: Deploys 4 Lambda functions in parallel with individual configurations
+- **Dual Infrastructure**: Supports both Terraform and CDK deployments
 - **Versioning**: Main Lambda uses versioning with aliases and canary deployments
 - **Rollback**: Automatic rollback on smoke test failures
 - **Code Quality**: Flake8 linting and Pylint static analysis
+- **Security**: TFSec security scanning for Terraform
 - **Backup**: Non-versioned Lambdas backed up to S3 before deployment
 
-### Jenkins Pipeline
-- Alternative CI/CD pipeline running on EC2
-- Deploys Lambda functions and syncs HTML to S3
-- CloudFront cache invalidation
+### AWS CDK Implementation
+The CDK implementation provides an alternative Infrastructure as Code approach:
+
+- **Python-based IaC**: Type-safe infrastructure definitions with IDE support
+- **Construct Library**: 5 reusable constructs (Storage, Compute, Networking, Security, Monitoring)
+- **Built-in Best Practices**: Automatic security and operational configurations
+- **CloudFormation Integration**: Leverages AWS CloudFormation for deployment
+- **Account/Region Specific**: Configured for account 083971419667 in us-east-1
+- **Unified Stack**: Single stack deployment with modular constructs
 
 ## Public URL
 
@@ -160,11 +185,13 @@ Jenkins (EC2) ──────────────────────
 
 ## Summary
 
-- **Modular Terraform Architecture**: 6 reusable modules with clear separation of concerns
+- **Dual Infrastructure Approach**: Terraform modules + AWS CDK constructs for flexible deployment
+- **Modular Architecture**: 6 reusable Terraform modules + 5 CDK constructs with clear separation of concerns
 - **Serverless Architecture**: 4 Lambda functions + API Gateway + DynamoDB + S3
-- **CI/CD**: Matrix-based deployments with path filtering and automated rollbacks
+- **Multi-Pipeline CI/CD**: GitHub Actions (matrix strategy) + path filtering and automated rollbacks
+- **Infrastructure as Code**: Both Terraform (HCL) and CDK (Python) implementations
 - **Monitoring & Alerting**: CloudWatch alarms + SNS notifications + automated rollback
-- **Security**: Cross-account S3 policies, IAM least privilege, private buckets with OAC
+- **Security**: Cross-account S3 policies, IAM least privilege, private buckets with OAC, TFSec scanning
 - **Scalability**: Lambda versioning, aliases, and canary deployments
 - **Code Quality**: Automated linting, static analysis, and smoke testing
 - **Multi-functionality**: View counter, like system, PDF downloads, and visitor analytics
