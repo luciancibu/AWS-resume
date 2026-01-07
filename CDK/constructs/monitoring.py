@@ -20,12 +20,12 @@ class MonitoringConstruct(Construct):
             subscriptions.EmailSubscription(notification_email)
         )
 
-        # # SNS Topic for rollback notifications
-        # self.rollback_sns_topic = sns.Topic(
-        #     self, "RollbackSNSTopic",
-        #     topic_name=f"lambda-rollback-topic-{account}-{region}"
-        # )
+        # SNS Topic for rollback notifications
+        self.rollback_sns_topic = sns.Topic(
+            self, "RollbackSNSTopic",
+            topic_name=f"lambda-rollback-topic-{account}-{region}"
+        )
 
-        # self.rollback_sns_topic.add_subscription(
-        #     subscriptions.EmailSubscription(notification_email)
-        # )
+        self.rollback_sns_topic.add_subscription(
+            subscriptions.EmailSubscription(notification_email)
+        )

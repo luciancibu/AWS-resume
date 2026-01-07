@@ -4,7 +4,7 @@ from aws_cdk import (
     aws_cloudfront_origins as origins,
     aws_apigatewayv2 as apigw,
     aws_apigatewayv2_integrations as integrations,    
-
+    aws_logs as logs
 )
 from constructs import Construct
 
@@ -79,4 +79,11 @@ class NetworkingConstruct(Construct):
             path="/pdf",
             methods=[apigw.HttpMethod.GET],
             integration=pdf_integration
+        )
+
+        # CloudWatch logs for API Gateway
+        self.api_log_group = logs.LogGroup(
+            self, "ApiGwLogs",
+            log_group_name="/aws/apigateway/resume-cdk-api-logs",
+            retention=logs.RetentionDays.TWO_WEEKS
         )
