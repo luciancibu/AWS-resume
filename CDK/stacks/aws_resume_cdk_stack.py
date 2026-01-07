@@ -58,6 +58,8 @@ class AwsResumeCdkStack(Stack):
             self, "Networking",
             website_bucket=storage.website_bucket,
             resume_lambda_alias=compute.resume_lambda_alias,
+            likes_lambda=compute.likes_lambda,
+            pdf_lambda=compute.pdf_lambda,
             account=self.account,
             region=self.region
         )

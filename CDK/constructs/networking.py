@@ -10,7 +10,8 @@ from constructs import Construct
 
 class NetworkingConstruct(Construct):
     def __init__(self, scope: Construct, construct_id: str, website_bucket: str, account: str, region: str, 
-                resume_lambda_alias: _lambda.IFunction, **kwargs) -> None:
+                resume_lambda_alias: _lambda.IFunction, likes_lambda: _lambda.IFunction, pdf_lambda: _lambda.IFunction, 
+                **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # CloudFront Distribution (without custom domain for simplicity)
@@ -45,9 +46,37 @@ class NetworkingConstruct(Construct):
             resume_lambda_alias
         )
 
+        likes_integration = integrations.HttpLambdaIntegration(
+            "LikesIntegration",
+            likes_lambda
+        )
+
+        pdf_integration = integrations.HttpLambdaIntegration(
+            "PdfIntegration",
+            pdf_lambda
+        )
+
         # API Routes
         self.api.add_routes(
             path="/view",
             methods=[apigw.HttpMethod.GET],
             integration=view_integration
+        )
+
+        self.api.add_routes(
+            path="/likes",
+            methods=[apigw.HttpMethod.GET],
+            integration=likes_integration
+        )
+
+        self.api.add_routes(
+            path="/likes",
+            methods=[apigw.HttpMethod.PUT],
+            integration=likes_integration
+        )  
+
+        self.api.add_routes(
+            path="/pdf",
+            methods=[apigw.HttpMethod.GET],
+            integration=pdf_integration
         )
