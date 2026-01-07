@@ -10,7 +10,8 @@ from constructs import Construct
 
 class ComputeConstruct(Construct):
     def __init__(self, scope: Construct, construct_id: str, account: str, region: str, 
-                 lambda_role: iam.Role, dynamodb_table: dynamodb.Table, sns_topic: sns.Topic, **kwargs) -> None:
+                 lambda_role: iam.Role, dynamodb_table: dynamodb.Table, sns_topic: sns.Topic,
+                **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # View counter Lambda
@@ -27,4 +28,15 @@ class ComputeConstruct(Construct):
                 "SNS_TOPIC_ARN": sns_topic.topic_arn,
                 "ITEM_ID": "views"
             }
+        )
+
+        # Publish 
+        version = self.resume_lambda.current_version
+
+        # Alias with weighted routing
+        self.resume_lambda_alias = _lambda.Alias(
+            self,
+            "ProdAlias",
+            alias_name="prodcdk",
+            version=version,
         )

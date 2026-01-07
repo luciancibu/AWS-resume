@@ -27,34 +27,35 @@ class AwsResumeCdkStack(Stack):
             region=self.region
         )
 
-        networking = NetworkingConstruct(
-            self, "Networking",
-            website_bucket=storage.website_bucket,
-            account=self.account,
-            region=self.region            
-        )
-
         monitoring = MonitoringConstruct(
             self, "Monitoring",
             account=self.account,
             region=self.region,
             notification_email="luciancibu@yahoo.com"
-        )           
-                
+        )
+
         security = SecurityConstruct(
             self, "Security",
             account_id=self.account,
             region=self.region,
             dynamodb_table=storage.dynamodb_table,
             sns_topic=monitoring.resume_sns_topic
-        ) 
-           
+        )
+
         compute = ComputeConstruct(
             self, "Compute",
             account=self.account,
-            region=self.region,            
+            region=self.region,
             lambda_role=security.lambda_role,
             dynamodb_table=storage.dynamodb_table,
-            sns_topic=monitoring.resume_sns_topic
-        )     
+            sns_topic=monitoring.resume_sns_topic,
+        )
+
+        networking = NetworkingConstruct(
+            self, "Networking",
+            website_bucket=storage.website_bucket,
+            resume_lambda_alias=compute.resume_lambda_alias,
+            account=self.account,
+            region=self.region
+        )
 
