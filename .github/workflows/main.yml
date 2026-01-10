@@ -17,7 +17,7 @@ env:
   CLOUDFRONT_DISTRIBUTION_ID: E99RBQPV79L7R
   CLOUDFRONT_DISTRIBUTION_ID_CDK: E2JAEZPVV8CD30
   VERSIONED_LAMBDA_ALIAS: prod
-  APIGW_URL: https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com
+  CLOUDFRONT_URL: https://d16rttnjyvt517.cloudfront.net/api/
   AWS_REGION: us-east-1
 
 jobs:
@@ -218,7 +218,7 @@ jobs:
         continue-on-error: true
         if: needs.detect_changes.outputs[matrix.lambda.key] == 'true'  && matrix.lambda.smoke_url != ''
         run: |
-          SMOKE_URL="${APIGW_URL}/${{ matrix.lambda.smoke_url }}"
+          SMOKE_URL="${CLOUDFRONT_URL}/${{ matrix.lambda.smoke_url }}"
           echo "Smoke testing: $SMOKE_URL"
           curl -fsS "$SMOKE_URL"
 
