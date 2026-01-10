@@ -5,7 +5,9 @@ from aws_cdk import (
     aws_apigatewayv2 as apigw,
     aws_apigatewayv2_integrations as integrations,    
     aws_logs as logs,
-    aws_certificatemanager as acm
+    aws_certificatemanager as acm,
+    Fn
+
 )
 from constructs import Construct
 
@@ -21,8 +23,15 @@ class NetworkingConstruct(Construct):
             "ResumeWildcardCert",
             "arn:aws:acm:us-east-1:083971419667:certificate/4a7a34ba-11ad-4555-ad9d-47a3e9adebf5",
         )
+        
+         # API Gateway
+        self.api = apigw.HttpApi(
+            self,
+            "ResumeApi",
+            api_name=f"ResumeApi-cdk-{account}-{region}",
+        )        
 
-        # CloudFront Distribution (without custom domain for simplicity)
+        # CloudFront Distribution
         self.distribution = cloudfront.Distribution(
             self,
             "ResumeDistribution",
@@ -38,18 +47,21 @@ class NetworkingConstruct(Construct):
             domain_names=["resume.kakosnita.xyz"],
             certificate=certificate,            
         )
-        
-         # API Gateway
-        self.api = apigw.HttpApi(
-            self,
-            "ResumeApi",
-            api_name=f"ResumeApi-cdk-{account}-{region}",
-            cors_preflight=apigw.CorsPreflightOptions(
-                allow_origins=["*"],
-                allow_methods=[apigw.CorsHttpMethod.GET, apigw.CorsHttpMethod.PUT, apigw.CorsHttpMethod.OPTIONS],
-                allow_headers=["*"],
-            ),
+
+        api_origin = origins.HttpOrigin(
+            Fn.select(2, Fn.split("/", self.api.api_endpoint))
         )
+        
+        self.distribution.add_behavior(
+            "/api/*",
+            api_origin,
+            viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
+            cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
+            origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+            compress=True,
+        )
+
         # Lambda integrations
         view_integration = integrations.HttpLambdaIntegration(
             "ViewIntegration",
@@ -68,25 +80,25 @@ class NetworkingConstruct(Construct):
 
         # API Routes
         self.api.add_routes(
-            path="/view",
+            path="/api/view",
             methods=[apigw.HttpMethod.GET],
             integration=view_integration
         )
 
         self.api.add_routes(
-            path="/likes",
+            path="/api/likes",
             methods=[apigw.HttpMethod.GET],
             integration=likes_integration
         )
 
         self.api.add_routes(
-            path="/likes",
+            path="/api/likes",
             methods=[apigw.HttpMethod.PUT],
             integration=likes_integration
         )  
 
         self.api.add_routes(
-            path="/pdf",
+            path="/api/pdf",
             methods=[apigw.HttpMethod.GET],
             integration=pdf_integration
         )
