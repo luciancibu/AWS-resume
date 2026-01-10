@@ -109,3 +109,4 @@ class NetworkingConstruct(Construct):
             log_group_name="/aws/apigateway/resume-cdk-api-logs",
             retention=logs.RetentionDays.TWO_WEEKS
         )
+        
