@@ -378,7 +378,7 @@
     <script>
       async function updateCounter() {
         const baseUrl =
-          "https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com/view";
+          "/api/view";
         const counted = sessionStorage.getItem("counted");
 
         try {
@@ -404,7 +404,7 @@
     <script>
       async function updateLike() {
         const API_URL =
-          "https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com/likes";
+          "/api/likes";
         const btn = document.getElementById("action-btn");
         const likesText = document.getElementById("likes");
 
@@ -435,7 +435,7 @@
     <script>
       function downloadPdf() {
         window.location.href =
-          "https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com/pdf";
+          "/api/pdf";
       }
     </script>
   </body>

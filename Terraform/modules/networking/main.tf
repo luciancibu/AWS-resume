@@ -32,9 +32,47 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
 
     s3_origin_config {
       origin_access_identity = ""
-    }
-    
+    } 
   }
+
+  origin {
+    domain_name = replace(
+      aws_apigatewayv2_api.resume_api.api_endpoint,  
+      "https://",  // remove https from the domain name, as CloudFront expects only the domain part
+      ""
+    )  
+      origin_id   = "api-origin"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  ordered_cache_behavior {
+    path_pattern           = "/api/*"
+    target_origin_id       = "api-origin"
+    viewer_protocol_policy = "redirect-to-https"
+
+    allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods  = ["GET", "HEAD"]
+
+    compress = true
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
+  }
+
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
@@ -111,13 +149,6 @@ resource "aws_s3_bucket_policy" "resume_policy" {
 resource "aws_apigatewayv2_api" "resume_api" {
   name          = "resume-api"
   protocol_type = "HTTP"
-
-  cors_configuration {
-    allow_origins = ["https://resume.lucian-cibu.xyz"]
-    allow_methods = ["GET", "PUT", "OPTIONS"]
-    allow_headers = ["content-type"]
-    max_age       = 300
-  }
 }
 
 # Lambda integrations
@@ -145,25 +176,25 @@ resource "aws_apigatewayv2_integration" "lambda_integration_pdf" {
 # API Routes
 resource "aws_apigatewayv2_route" "counter_route" {
   api_id    = aws_apigatewayv2_api.resume_api.id
-  route_key = "GET /view"
+  route_key = "GET /api/view"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
 resource "aws_apigatewayv2_route" "likes_put_route" {
   api_id    = aws_apigatewayv2_api.resume_api.id
-  route_key = "PUT /likes"
+  route_key = "PUT /api/likes"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration_likes.id}"
 }
 
 resource "aws_apigatewayv2_route" "likes_get_route" {
   api_id    = aws_apigatewayv2_api.resume_api.id
-  route_key = "GET /likes"
+  route_key = "GET /api/likes"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration_likes.id}"
 }
 
 resource "aws_apigatewayv2_route" "pdf_get_route" {
   api_id    = aws_apigatewayv2_api.resume_api.id
-  route_key = "GET /pdf"
+  route_key = "GET /api/pdf"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration_pdf.id}"
 }
 
