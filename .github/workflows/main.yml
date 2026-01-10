@@ -12,8 +12,10 @@ on:
 env:
   LAMBDA_FUNCTION: lambda-terraform
   S3_BUCKET: s3-terraform-083971419667
+  S3_BUCKET_CDK: s3-terraform-cdk-083971419667-us-east-1
   S3_BUCKET_LAMBDA: s3-lambda-083971419667
   CLOUDFRONT_DISTRIBUTION_ID: E99RBQPV79L7R
+  CLOUDFRONT_DISTRIBUTION_ID_CDK: E2JAEZPVV8CD30
   VERSIONED_LAMBDA_ALIAS: prod
   APIGW_URL: https://rl6xx63qb1.execute-api.us-east-1.amazonaws.com
   AWS_REGION: us-east-1
@@ -83,14 +85,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Sync HTML to S3
-        run: aws s3 sync html/ s3://${{ env.S3_BUCKET }}/ --delete
-
-      - name: Invalidate CloudFront
+      - name: Sync HTML to all S3 buckets
         run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
+          aws s3 sync html/ s3://${{ env.S3_BUCKET }}/ --delete
+          aws s3 sync html/ s3://${{ env.S3_BUCKET_CDK }}/ --delete
+
+      - name: Invalidate all CloudFront distributions
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID_CDK }} --paths "/*"
+
 
   deploy_lambda:
     if: needs.detect_changes.outputs.lambda == 'true'
