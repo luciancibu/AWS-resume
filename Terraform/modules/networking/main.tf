@@ -53,6 +53,11 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
     target_origin_id       = "api-origin"
     viewer_protocol_policy = "redirect-to-https"
 
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.add_api_key.arn
+    }
+    
     allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods  = ["GET", "HEAD"]
 
@@ -255,6 +260,21 @@ resource "aws_api_gateway_integration" "pdf_lambda" {
 # deploy/stage
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.resume_api.id
+
+  triggers = {
+    redeploy = sha1(jsonencode([
+      aws_api_gateway_method.view_get.id,
+      aws_api_gateway_method.likes_get.id,
+      aws_api_gateway_method.likes_put.id,
+      aws_api_gateway_method.pdf_get.id
+    ]))
+  }
+
+  # Ensure a new API Gateway deployment is created before the old one is destroyed.
+  # This prevents errors when an active stage (e.g., "prod") is still pointing to the current deployment.
+  lifecycle {
+    create_before_destroy = true
+  }
 
   depends_on = [
     aws_api_gateway_integration.view_lambda,
