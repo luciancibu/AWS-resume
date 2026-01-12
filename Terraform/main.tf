@@ -79,6 +79,7 @@ module "networking" {
 
   region                         = var.region
   root_domain_name               = var.root_domain_name
+  api_gateway_api_key            = var.api_gateway_api_key
   s3_bucket_domain_name          = module.storage.website_bucket_domain_name
   s3_bucket_id                   = module.storage.website_bucket_id
   s3_bucket_arn                  = module.storage.website_bucket_arn

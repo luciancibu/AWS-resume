@@ -57,3 +57,8 @@ variable "region" {
   description = "AWS region"
   type        = string
 }
+
+variable "api_gateway_api_key" {
+  type      = string
+  sensitive = true
+}

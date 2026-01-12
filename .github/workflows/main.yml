@@ -19,6 +19,7 @@ env:
   VERSIONED_LAMBDA_ALIAS: prod
   CLOUDFRONT_URL: https://d16rttnjyvt517.cloudfront.net/api/
   AWS_REGION: us-east-1
+  TF_VAR_api_gateway_api_key: ${{ secrets.API_GATEWAY_API_KEY }}
 
 jobs:
   detect_changes:

@@ -66,3 +66,8 @@ variable "pdf_file_name" {
   type        = string
   default     = "lucian_cibu_resume.pdf"
 }
+
+variable "api_gateway_api_key" {
+  type      = string
+  sensitive = true
+}

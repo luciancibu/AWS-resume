@@ -318,3 +318,23 @@ resource "aws_api_gateway_usage_plan_key" "resume_key_attach" {
   key_type      = "API_KEY"
   usage_plan_id = aws_api_gateway_usage_plan.resume_plan.id
 }
+
+# Cloudfront Function to add API key header
+resource "aws_cloudfront_function" "add_api_key" {
+  name    = "add-api-key"
+  runtime = "cloudfront-js-1.0"
+
+  code = <<EOF
+function handler(event) {
+  var request = event.request;
+
+  request.headers['x-api-key'] = {
+    value: '${var.api_gateway_api_key}'
+  };
+
+  return request;
+}
+EOF
+}
+ 
+ 
