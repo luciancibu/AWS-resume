@@ -76,7 +76,6 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
     max_ttl     = 0
   }
 
-
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
@@ -367,3 +366,8 @@ function handler(event) {
 EOF
 }
  
+# CloudWatch logs group
+ resource "aws_cloudwatch_log_group" "api_gw_logs" {
+  name              = "/aws/apigateway/resume"
+  retention_in_days = 14
+}

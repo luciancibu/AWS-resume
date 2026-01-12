@@ -259,8 +259,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install tfsec
+        id: tfsec
         run: |
           curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+        continue-on-error: true
+
+      - name: Install tfsec
+        if: steps.tfsec.outcome == 'failure'
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -284,7 +291,6 @@ jobs:
 
       - name: Terraform security scan
         run: tfsec --minimum-severity LOW .
-        continue-on-error: true
 
       - name: Terraform plan
         id: plan
