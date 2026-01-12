@@ -60,6 +60,7 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
 
     forwarded_values {
       query_string = false
+      headers      = ["x-api-key"]
       cookies {
         forward = "none"
       }
@@ -181,7 +182,7 @@ resource "aws_api_gateway_method" "view_get" {
   resource_id      = aws_api_gateway_resource.view.id
   http_method      = "GET"
   authorization    = "NONE"
-  api_key_required = false
+  api_key_required = true
 }
 
 resource "aws_api_gateway_method" "likes_get" {
@@ -189,7 +190,7 @@ resource "aws_api_gateway_method" "likes_get" {
   resource_id      = aws_api_gateway_resource.likes.id
   http_method      = "GET"
   authorization    = "NONE"
-  api_key_required = false
+  api_key_required = true
 }
 
 resource "aws_api_gateway_method" "likes_put" {
@@ -197,7 +198,7 @@ resource "aws_api_gateway_method" "likes_put" {
   resource_id      = aws_api_gateway_resource.likes.id
   http_method      = "PUT"
   authorization    = "NONE"
-  api_key_required = false
+  api_key_required = true
 }
 
 resource "aws_api_gateway_method" "pdf_get" {
@@ -205,7 +206,7 @@ resource "aws_api_gateway_method" "pdf_get" {
   resource_id      = aws_api_gateway_resource.pdf.id
   http_method      = "GET"
   authorization    = "NONE"
-  api_key_required = false
+  api_key_required = true
 }
 
 # view → Lambda ALIAS
@@ -295,4 +296,25 @@ resource "aws_lambda_permission" "allow_apigw_pdf" {
   function_name = var.pdf_lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.resume_api.execution_arn}/*/*"
+}
+
+# Api key + usage plan
+resource "aws_api_gateway_api_key" "resume_key" {
+  name    = "resume-api-key"
+  enabled = true
+}
+
+resource "aws_api_gateway_usage_plan" "resume_plan" {
+  name = "resume-plan"
+
+  api_stages {
+    api_id = aws_api_gateway_rest_api.resume_api.id
+    stage  = aws_api_gateway_stage.prod.stage_name
+  }
+}
+
+resource "aws_api_gateway_usage_plan_key" "resume_key_attach" {
+  key_id        = aws_api_gateway_api_key.resume_key.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.resume_plan.id
 }
