@@ -61,7 +61,7 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
     allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods  = ["GET", "HEAD"]
 
-    compress = true
+    compress = false
 
     forwarded_values {
       query_string = false
@@ -150,6 +150,11 @@ resource "aws_s3_bucket_policy" "resume_policy" {
 ### Rest API
 resource "aws_api_gateway_rest_api" "resume_api" {
   name = "resume-api"
+
+  # Required for reliable Base64 decoding with AWS_PROXY integrations
+  # Force binary handling for all responses to avoid Base64 decoding issues.
+  binary_media_types = ["*/*"]
+
 }
 
 # /api
@@ -262,6 +267,7 @@ resource "aws_api_gateway_deployment" "deploy" {
 
   triggers = {
     redeploy = sha1(jsonencode([
+      aws_api_gateway_rest_api.resume_api.binary_media_types,
       aws_api_gateway_method.view_get.id,
       aws_api_gateway_method.likes_get.id,
       aws_api_gateway_method.likes_put.id,
@@ -366,8 +372,3 @@ function handler(event) {
 EOF
 }
  
-# CloudWatch logs group
- resource "aws_cloudwatch_log_group" "api_gw_logs" {
-  name              = "/aws/apigateway/resume"
-  retention_in_days = 14
-}
