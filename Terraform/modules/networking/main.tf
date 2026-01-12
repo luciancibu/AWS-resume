@@ -331,6 +331,16 @@ resource "aws_api_gateway_usage_plan" "resume_plan" {
     api_id = aws_api_gateway_rest_api.resume_api.id
     stage  = aws_api_gateway_stage.prod.stage_name
   }
+
+  quota_settings {
+    limit  = 1000
+    period = "DAY"
+  }
+
+  throttle_settings {
+    rate_limit  = 100
+    burst_limit = 100
+  }  
 }
 
 resource "aws_api_gateway_usage_plan_key" "resume_key_attach" {
