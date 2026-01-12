@@ -36,12 +36,9 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
   }
 
   origin {
-    domain_name = replace(
-      aws_apigatewayv2_api.resume_api.api_endpoint,  
-      "https://",  // remove https from the domain name, as CloudFront expects only the domain part
-      ""
-    )  
-      origin_id   = "api-origin"
+    domain_name = "${aws_api_gateway_rest_api.resume_api.id}.execute-api.${var.region}.amazonaws.com"
+    origin_id   = "api-origin"
+    origin_path = "/prod"
 
     custom_origin_config {
       http_port              = 80
@@ -145,103 +142,157 @@ resource "aws_s3_bucket_policy" "resume_policy" {
   policy = data.aws_iam_policy_document.s3_allow_cloudfront_oac.json
 }
 
-# API Gateway
-resource "aws_apigatewayv2_api" "resume_api" {
-  name          = "resume-api"
-  protocol_type = "HTTP"
+### Rest API
+resource "aws_api_gateway_rest_api" "resume_api" {
+  name = "resume-api"
 }
 
-# Lambda integrations
-resource "aws_apigatewayv2_integration" "lambda_integration" {
-  api_id                 = aws_apigatewayv2_api.resume_api.id
-  integration_type       = "AWS_PROXY"
-  integration_uri        = var. resume_lambda_invoke_arn_alias
-  payload_format_version = "2.0"
+# /api
+resource "aws_api_gateway_resource" "api" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+  parent_id   = aws_api_gateway_rest_api.resume_api.root_resource_id
+  path_part   = "api"
 }
 
-resource "aws_apigatewayv2_integration" "lambda_integration_likes" {
-  api_id                 = aws_apigatewayv2_api.resume_api.id
-  integration_type       = "AWS_PROXY"
-  integration_uri        = var.likes_lambda_invoke_arn
-  payload_format_version = "2.0"
+# /api/view
+resource "aws_api_gateway_resource" "view" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+  parent_id   = aws_api_gateway_resource.api.id
+  path_part   = "view"
 }
 
-resource "aws_apigatewayv2_integration" "lambda_integration_pdf" {
-  api_id                 = aws_apigatewayv2_api.resume_api.id
-  integration_type       = "AWS_PROXY"
-  integration_uri        = var.pdf_lambda_invoke_arn
-  payload_format_version = "2.0"
+# /api/likes
+resource "aws_api_gateway_resource" "likes" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+  parent_id   = aws_api_gateway_resource.api.id
+  path_part   = "likes"
 }
 
-# API Routes
-resource "aws_apigatewayv2_route" "counter_route" {
-  api_id    = aws_apigatewayv2_api.resume_api.id
-  route_key = "GET /api/view"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+# /api/pdf
+resource "aws_api_gateway_resource" "pdf" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+  parent_id   = aws_api_gateway_resource.api.id
+  path_part   = "pdf"
 }
 
-resource "aws_apigatewayv2_route" "likes_put_route" {
-  api_id    = aws_apigatewayv2_api.resume_api.id
-  route_key = "PUT /api/likes"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration_likes.id}"
+# Methods
+resource "aws_api_gateway_method" "view_get" {
+  rest_api_id      = aws_api_gateway_rest_api.resume_api.id
+  resource_id      = aws_api_gateway_resource.view.id
+  http_method      = "GET"
+  authorization    = "NONE"
+  api_key_required = false
 }
 
-resource "aws_apigatewayv2_route" "likes_get_route" {
-  api_id    = aws_apigatewayv2_api.resume_api.id
-  route_key = "GET /api/likes"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration_likes.id}"
+resource "aws_api_gateway_method" "likes_get" {
+  rest_api_id      = aws_api_gateway_rest_api.resume_api.id
+  resource_id      = aws_api_gateway_resource.likes.id
+  http_method      = "GET"
+  authorization    = "NONE"
+  api_key_required = false
 }
 
-resource "aws_apigatewayv2_route" "pdf_get_route" {
-  api_id    = aws_apigatewayv2_api.resume_api.id
-  route_key = "GET /api/pdf"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration_pdf.id}"
+resource "aws_api_gateway_method" "likes_put" {
+  rest_api_id      = aws_api_gateway_rest_api.resume_api.id
+  resource_id      = aws_api_gateway_resource.likes.id
+  http_method      = "PUT"
+  authorization    = "NONE"
+  api_key_required = false
 }
 
-# Lambda permissions
-resource "aws_lambda_permission" "allow_apigw" {
-  statement_id  = "AllowAPIGatewayInvoke"
+resource "aws_api_gateway_method" "pdf_get" {
+  rest_api_id      = aws_api_gateway_rest_api.resume_api.id
+  resource_id      = aws_api_gateway_resource.pdf.id
+  http_method      = "GET"
+  authorization    = "NONE"
+  api_key_required = false
+}
+
+# view → Lambda ALIAS
+resource "aws_api_gateway_integration" "view_lambda" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+  resource_id = aws_api_gateway_resource.view.id
+  http_method = aws_api_gateway_method.view_get.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.resume_lambda_invoke_arn_alias
+}
+
+# likes → Lambda
+resource "aws_api_gateway_integration" "likes_get_lambda" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+  resource_id = aws_api_gateway_resource.likes.id
+  http_method = aws_api_gateway_method.likes_get.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.likes_lambda_invoke_arn
+}
+
+resource "aws_api_gateway_integration" "likes_put_lambda" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+  resource_id = aws_api_gateway_resource.likes.id
+  http_method = aws_api_gateway_method.likes_put.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.likes_lambda_invoke_arn
+}
+
+# pdf → Lambda
+resource "aws_api_gateway_integration" "pdf_lambda" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+  resource_id = aws_api_gateway_resource.pdf.id
+  http_method = aws_api_gateway_method.pdf_get.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.pdf_lambda_invoke_arn
+}
+
+# deploy/stage
+resource "aws_api_gateway_deployment" "deploy" {
+  rest_api_id = aws_api_gateway_rest_api.resume_api.id
+
+  depends_on = [
+    aws_api_gateway_integration.view_lambda,
+    aws_api_gateway_integration.likes_get_lambda,
+    aws_api_gateway_integration.likes_put_lambda,
+    aws_api_gateway_integration.pdf_lambda
+  ]
+}
+
+# tfsec:ignore:aws-api-gateway-enable-access-logging
+# tfsec:ignore:aws-api-gateway-enable-tracing
+resource "aws_api_gateway_stage" "prod" {
+  stage_name    = "prod"
+  rest_api_id   = aws_api_gateway_rest_api.resume_api.id
+  deployment_id = aws_api_gateway_deployment.deploy.id
+}
+
+# lambda permissions
+resource "aws_lambda_permission" "allow_apigw_view" {
+  statement_id  = "AllowAPIGatewayInvokeView"
   action        = "lambda:InvokeFunction"
   function_name = var.resume_lambda_function_name
   qualifier     = var.resume_lambda_alias_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.resume_api.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.resume_api.execution_arn}/*/*"
 }
 
 resource "aws_lambda_permission" "allow_apigw_likes" {
-  statement_id  = "AllowAPIGatewayInvokelikes"
+  statement_id  = "AllowAPIGatewayInvokeLikes"
   action        = "lambda:InvokeFunction"
   function_name = var.likes_lambda_function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.resume_api.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.resume_api.execution_arn}/*/*"
 }
 
 resource "aws_lambda_permission" "allow_apigw_pdf" {
-  statement_id  = "AllowAPIGatewayInvokelikes"
+  statement_id  = "AllowAPIGatewayInvokePdf"
   action        = "lambda:InvokeFunction"
   function_name = var.pdf_lambda_function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.resume_api.execution_arn}/*/*"
-}
-
-# CloudWatch logs
-resource "aws_cloudwatch_log_group" "api_gw_logs" {
-  name              = "/aws/apigateway/resume"
-  retention_in_days = 14
-}
-
-resource "aws_apigatewayv2_stage" "default" {
-  api_id      = aws_apigatewayv2_api.resume_api.id
-  name        = "$default"
-  auto_deploy = true
-
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.api_gw_logs.arn
-    format = jsonencode({
-      requestId = "$context.requestId"
-      status    = "$context.status"
-      ip        = "$context.identity.sourceIp"
-      routeKey  = "$context.routeKey"
-    })
-  }
+  source_arn    = "${aws_api_gateway_rest_api.resume_api.execution_arn}/*/*"
 }

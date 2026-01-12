@@ -14,6 +14,5 @@ output "cloudfront_domain_name" {
 }
 
 output "api_gateway_url" {
-  description = "URL of the API Gateway"
-  value       = aws_apigatewayv2_api.resume_api.api_endpoint
+  value = "https://${aws_api_gateway_rest_api.resume_api.id}.execute-api.${var.region}.amazonaws.com/prod"
 }

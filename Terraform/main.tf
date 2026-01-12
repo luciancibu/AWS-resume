@@ -77,6 +77,7 @@ module "compute" {
 module "networking" {
   source = "./modules/networking"
 
+  region                         = var.region
   root_domain_name               = var.root_domain_name
   s3_bucket_domain_name          = module.storage.website_bucket_domain_name
   s3_bucket_id                   = module.storage.website_bucket_id

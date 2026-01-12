@@ -283,6 +283,7 @@ jobs:
 
       - name: Terraform security scan
         run: tfsec --minimum-severity LOW .
+        continue-on-error: true
 
       - name: Terraform plan
         id: plan

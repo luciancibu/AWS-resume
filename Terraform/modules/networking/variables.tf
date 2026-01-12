@@ -52,3 +52,8 @@ variable "resume_lambda_alias_name" {
   description = "Name of the Lambda alias"
   type        = string
 }
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+}
