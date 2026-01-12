@@ -329,12 +329,11 @@ function handler(event) {
   var request = event.request;
 
   request.headers['x-api-key'] = {
-    value: '${var.api_gateway_api_key}'
+    value: '0JAbw2U8fI4nz2vbNCQ3O2uwJUJK1SRr4rJhMsfh'
   };
 
   return request;
 }
 EOF
 }
- 
  
