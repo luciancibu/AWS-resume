@@ -1,23 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="x-dns-prefetch-control" content="off" />
     <title>Lucian Cibu - Resume</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    
+    <link rel="stylesheet" href="/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
   </head>
 
   <body>
     <div class="page">
       <!-- Header -->
       <header class="header">
-        <div class="name-title">
-          <h1 class="name">Lucian Cibu</h1>
-          <p class="role">Software Engineer</p>
-          <p class="location">Cluj-Napoca, Romania</p>
+        <div class="name-title name-with-badge">
+          <div class="name-text">
+            <h1 class="name">Lucian Cibu</h1>
+            <p class="role">Software Engineer</p>
+            <p class="location">Cluj-Napoca, Romania</p>
+          </div>
+
+          <a
+            class="credly-badge"
+            href="https://www.credly.com/badges/dea55d72-5425-4fc9-8556-780eb686a92a/linked_in_profile"
+            target="_blank"
+            rel="noopener"
+            title="AWS Certified Developer – Associate"
+          >
+            <img
+              src="https://preview.redd.it/i-passed-dva-c02-in-just-2-weeks-of-study-aws-certified-v0-m4xgn758lode1.png?width=600&format=png&auto=webp&s=dc8f7b9b23bf14460612450760aac8b40eafc9e6"
+              alt="AWS Certified Developer – Associate"
+            />
+          </a>
         </div>
+
         <div class="contact">
           <div class="contact-item">
             <span class="contact-label">Phone</span>
@@ -55,7 +74,10 @@
             networking, virtualization, and deep learning pipelines. Hands-on
             with Linux/QNX development, real-time data processing, remote
             debugging, communication protocols, containerized environments, and
-            automation scripts.
+            automation scripts. <br />
+            <strong>AWS Certified Developer Associate (DVA-C02)</strong>, with a
+            strong understanding of AWS services, serverless concepts, and cloud
+            application development.
           </p>
         </section>
 
@@ -64,46 +86,53 @@
           <h2 class="section-title">Skills</h2>
 
           <div class="skills-grid">
-            <div class="skill-block">
-              <h3>Programming & Tools</h3>
-              <ul>
-                <li>Python, C/C++, Bash</li>
-                <li>Docker, Git, GitHub, CUDA, CMake</li>
-              </ul>
+            <div class="skill-column">
+              <div class="skill-block">
+                <h3>Programming & Tools</h3>
+                <ul>
+                  <li>Python, C/C++, Bash</li>
+                  <li>Docker, Git, GitHub, CUDA, CMake</li>
+                </ul>
+              </div>
+
+              <div class="skill-block">
+                <h3>Other</h3>
+                <ul>
+                  <li>Agile / Scrum, Jira</li>
+                  <li>Team Collaboration</li>
+                  <li>English (Fluent)</li>
+                </ul>
+              </div>
             </div>
 
-            <div class="skill-block">
-              <h3>Infra & AI</h3>
-              <ul>
-                <li>Windows / Linux / QNX</li>
-                <li>SSH, TCP/IP Networking</li>
-                <li>Remote Debugging, Automation Scripting</li>
-                <li>ONNX Runtime, Neural Network Quantization</li>
-                <li>Real-time Image Processing</li>
-                <li>CAN, FlexRay</li>
-              </ul>
+            <div class="skill-column">
+              <div class="skill-block">
+                <h3>Infra & AI</h3>
+                <ul>
+                  <li>Windows / Linux / QNX</li>
+                  <li>SSH, TCP/IP Networking</li>
+                  <li>Remote Debugging, Automation Scripting</li>
+                  <li>ONNX Runtime, Neural Network Quantization</li>
+                  <li>Real-time Image Processing</li>
+                  <li>CAN, FlexRay</li>
+                  <li>Ansible</li>
+                </ul>
+              </div>
             </div>
 
-            <div class="skill-block">
-              <h3>Familiar With</h3>
-              <ul>
-                <li>AWS (EC2, S3, IAM etc.)</li>
-                <li>Kubernetes (EKS)</li>
-                <li>Infrastructure as Code: Terraform, Ansible</li>
-                <li>CI/CD: GitHub Actions, Jenkins</li>
-                <li>
-                  Monitoring & Logging: Prometheus, Grafana, Loki, CloudWatch
-                </li>
-              </ul>
-            </div>
-
-            <div class="skill-block">
-              <h3>Other</h3>
-              <ul>
-                <li>Agile / Scrum, Jira</li>
-                <li>Team Collaboration</li>
-                <li>English (Fluent)</li>
-              </ul>
+            <div class="skill-column">
+              <div class="skill-block">
+                <h3>Cloud & Platform Technologies:</h3>
+                <ul>
+                  <li>AWS (IAM, Lambda, API Gateway, EC2, ECS, S3 etc.)</li>
+                  <li>Infrastructure as Code: Terraform, AWS CDK</li>
+                  <li>Container Orchestration (Kubernetes / EKS)</li>
+                  <li>CI/CD: GitHub Actions, Jenkins</li>
+                  <li>
+                    Monitoring & Logging: Prometheus, Grafana, Loki, CloudWatch
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
@@ -222,9 +251,15 @@
           <article class="project-item">
             <h3>Serverless AWS Resume Website</h3>
             <p>
-              Deployed a serverless resume website with dual Infrastructure as Code
-              (Terraform/CDK), featuring 4 Lambda functions, API Gateway, DynamoDB,
-              S3, CloudFront, and automated CI/CD through GitHub Actions and Jenkins.
+              Designed and deployed a serverless resume web application on AWS
+              using S3 for static hosting and CloudFront for global content
+              delivery. Implemented a dynamic visitor counter with a
+              Python-based AWS Lambda backend exposed via API Gateway and backed
+              by DynamoDB. Provisioned the entire infrastructure as code using
+              Terraform/AWS CDK (IAM, Lambda, API Gateway, S3, CloudFront,
+              DynamoDB, SNS); and built automated CI/CD pipelines with GitHub
+              Actions to deploy frontend and backend components and invalidate
+              the CloudFront cache.
               <br />
               <a href="https://github.com/luciancibu/AWS-resume" target="_blank"
                 >(GitHub Repository)</a
@@ -358,26 +393,27 @@
           </article>
         </section>
       </main>
-      <div class="views">
-        <p id="view-counter">Loading views...</p>
-      </div>
+      <div class="actions-panel">
+        <div class="actions-text">
+          <p id="likes">Loading likes...</p>
+          <p id="view-counter">Loading views...</p>
+        </div>
 
-      <div class="Likes">
-        <button id="action-btn" class="btn-primary">Like <i class="fa fa-thumbs-up"></i></button>
+        <div class="actions-buttons">
+          <button id="action-btn" class="btn-primary">
+            Like <i class="fa fa-thumbs-up"></i>
+          </button>
 
-        <p id="likes">Loading likes...</p>
-      </div>
-
-      <div class="PDF">
-        <button class="btn-primary" onclick="downloadPdf()">Download Resume</button>
-
+          <button class="btn-primary" onclick="downloadPdf()">
+            Download Resume
+          </button>
+        </div>
       </div>
     </div>
 
     <script>
       async function updateCounter() {
-        const baseUrl =
-          "/api/view";
+        const baseUrl = "/api/view";
         const counted = sessionStorage.getItem("counted");
 
         try {
@@ -402,8 +438,7 @@
 
     <script>
       async function updateLike() {
-        const API_URL =
-          "/api/likes";
+        const API_URL = "/api/likes";
         const btn = document.getElementById("action-btn");
         const likesText = document.getElementById("likes");
 
@@ -433,8 +468,7 @@
 
     <script>
       function downloadPdf() {
-        window.location.href =
-          "/api/pdf";
+        window.location.href = "/api/pdf";
       }
     </script>
   </body>
